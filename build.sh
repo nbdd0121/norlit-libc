@@ -1,0 +1,1 @@
+i686-elf-gcc -Wall -Iinclude/ -shared -Wl,-shared `find src | grep '\.c$'` -o ../libc.so
