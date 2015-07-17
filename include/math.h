@@ -17,7 +17,7 @@ typedef double double_t;
 #define FP_NORMAL    4
 
 // INT_MIN
-#define FP_ILOGBNAN (-1-(int)(((unsigned)-1)>>1))
+#define FP_ILOGBNAN (1<<(sizeof(int)*8-1))
 #define FP_ILOGB0 FP_ILOGBNAN
 
 #define MATH_ERRNO          1
@@ -31,7 +31,7 @@ static inline unsigned __float_to_bits(float __f) {
 	} __u = {__f};
 	return __u.__i;
 }
-static __inline unsigned long long __double_to_bits(double __f) {
+static inline unsigned long long __double_to_bits(double __f) {
 	union {
 		double __f;
 		unsigned long long __i;
