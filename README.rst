@@ -19,7 +19,7 @@ Header               Status
 <iso646.h>         **Freestanding**
 <limits.h>         **Freestanding**
 <locale.h>         **Implemented**
-<math.h>           22/69 (ISO C), 0/6 (POSIX)
+<math.h>           27/69 (ISO C), 0/6 (POSIX)
 <setjmp.h>         Under consideration
 <signal.h>         Under consideration
 <stdalign.h>       **Freestanding**
