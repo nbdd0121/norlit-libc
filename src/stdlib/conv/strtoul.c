@@ -3,7 +3,7 @@
 #include <errno.h>
 
 unsigned long strtoul(const char * restrict nptr, char ** restrict endptr, int base) {
-	uint64_t ret = 0;
+	unsigned long long ret = 0;
 	int sign = scan_int(nptr, endptr, base, &ret);
 	if (sign < 0) {
 		errno = -sign;

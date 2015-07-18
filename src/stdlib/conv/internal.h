@@ -13,13 +13,13 @@
  * return: last char processed + 1
  */
 __attribute__((visibility("hidden")))
-const char* scan_decimal(const char* str, uint64_t* data, int* len, int* overflow, int base);
+const char* scan_decimal(const char* str, unsigned long long* data, int* len, int* overflow, int base);
 
 __attribute__((visibility("hidden")))
 const char* scan_space(const char* str);
 
 __attribute__((visibility("hidden")))
-int scan_int(const char * restrict nptr, char ** restrict endptr, int base, uint64_t* ret);
+int scan_int(const char * restrict nptr, char ** restrict endptr, int base, unsigned long long* ret);
 
 __attribute__((visibility("hidden")))
 void desemble_double(double v, uint64_t* s, int* n, int* k);

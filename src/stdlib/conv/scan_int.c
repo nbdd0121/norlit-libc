@@ -2,7 +2,7 @@
 #include <limits.h>
 #include <errno.h>
 
-int scan_int(const char * restrict nptr, char ** restrict endptr, int base, uint64_t* ret) {
+int scan_int(const char * restrict nptr, char ** restrict endptr, int base, unsigned long long* ret) {
 	nptr = scan_space(nptr);
 
 	int neg = 0;

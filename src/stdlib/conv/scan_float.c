@@ -39,7 +39,7 @@ const char* scan_float(const char* ptr, double* data) {
         base = 16;
     }
 
-    uint64_t s = 0;
+    unsigned long long s = 0;
     int n = 0;
     int k = 0;
 
@@ -72,7 +72,7 @@ const char* scan_float(const char* ptr, double* data) {
             ptr++;
         }
 
-        uint64_t expPart = 0;
+        unsigned long long expPart = 0;
         int expPartLength = 0;
         ptr = scan_decimal(ptr, &expPart, &expPartLength, NULL, 10);
         if (expPart > 1000) expPart = 1000;
@@ -81,9 +81,13 @@ const char* scan_float(const char* ptr, double* data) {
             ptr = beforeExp;
         }
 
-        n = (sign ? -1 : 1) * expPart;
+        n = (sign ? -1 : 1) * (int)expPart;
     }
 
-    *data = (base == 16 ? assemble_double_hex : assemble_double)(s, n, k);
+    while (s > UINT64_MAX) {
+        s >>= 1;
+    }
+
+    *data = (base == 16 ? assemble_double_hex : assemble_double)((uint64_t)s, n, k);
     return ptr;
 }
