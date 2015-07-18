@@ -8,28 +8,34 @@ static inline int getdigit(char ch) {
 	return -1;
 }
 
-const char* scan_decimal(const char* str, size_t len, uint64_t* data, int* overflow, int base) {
+const char* scan_decimal(const char* str, uint64_t* data, int* len, int* overflow, int base) {
 	bool overflowFlag = false;
-	size_t ptr = 0;
-	uint64_t ret = *data;
-	for (; ptr < len; ptr++) {
-		int val = getdigit(str[ptr]);
-		if (val >= 0 && val < base) {
+	int overflowDigits = 0;
+	uint64_t value = *data;
+	const char* ptr = str;
+	for (; *ptr; ptr++) {
+		int digit = getdigit(*ptr);
+		if (digit >= 0 && digit < base) {
 			if (!overflowFlag) {
-				uint64_t newVal = ret * base + val;
-				if (newVal > ret) {
-					ret = newVal;
-				} else {
+				uint64_t newVal;
+				if (__builtin_umulll_overflow(value, base, &newVal) ||
+				        __builtin_uaddll_overflow(newVal, digit, &newVal)) {
 					overflowFlag = true;
+				} else {
+					value = newVal;
 				}
 			}
-			if (overflowFlag && overflow) {
-				(*overflow)++;
+			if (overflowFlag) {
+				overflowDigits++;
 			}
 		} else {
 			break;
 		}
 	}
-	*data = ret;
-	return str + ptr;
+	*data = value;
+	if (len)
+		*len += ptr - str - overflowDigits;
+	if (overflow)
+		*overflow = overflowDigits;
+	return ptr;
 }

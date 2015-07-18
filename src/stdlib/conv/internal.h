@@ -13,7 +13,7 @@
  * return: last char processed + 1
  */
 __attribute__((visibility("hidden")))
-const char* scan_decimal(const char* str, size_t strlen, uint64_t* data, int* overflow, int base);
+const char* scan_decimal(const char* str, uint64_t* data, int* len, int* overflow, int base);
 
 __attribute__((visibility("hidden")))
 const char* scan_space(const char* str);

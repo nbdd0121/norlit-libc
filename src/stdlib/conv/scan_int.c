@@ -38,7 +38,7 @@ int scan_int(const char * restrict nptr, char ** restrict endptr, int base, uint
 	}
 
 	int overflow = 0;
-	const char* finptr = scan_decimal(nptr, (size_t) - 1, ret, &overflow, base);
+	const char* finptr = scan_decimal(nptr, ret, NULL, &overflow, base);
 	if (endptr) {
 		*endptr = (char*)finptr;
 	}
