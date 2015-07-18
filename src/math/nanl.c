@@ -1,5 +1,5 @@
 #include <math.h>
 
-long double nan(const char *s) {
+long double nanl(const char *s) {
 	return NAN;
 }

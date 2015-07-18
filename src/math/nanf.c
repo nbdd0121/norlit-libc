@@ -1,5 +1,5 @@
 #include <math.h>
 
-float nan(const char *s) {
+float nanf(const char *s) {
 	return NAN;
 }

@@ -19,7 +19,7 @@ Header               Status
 <iso646.h>         **Freestanding**
 <limits.h>         **Freestanding**
 <locale.h>         **Implemented**
-<math.h>           11/69 (ISO C), 0/6 (POSIX)
+<math.h>           22/69 (ISO C), 0/6 (POSIX)
 <setjmp.h>         Under consideration
 <signal.h>         Under consideration
 <stdalign.h>       **Freestanding**
@@ -47,6 +47,11 @@ Header               Status
 .. [5] Conditional features are not in priority
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
+
+Notice
+======
+
+- floating point numbers-related functions may have larger margin of error than expected
 
 wchar and uchar
 ===============
