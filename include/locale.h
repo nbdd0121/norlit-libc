@@ -1,6 +1,3 @@
-#ifndef _NORLIT_LIBC_LOCALE_H
-#define _NORLIT_LIBC_LOCALE_H
-
 #if !defined(__need_locale_t)
 #define __need_locale_t
 #define __need_others
@@ -8,12 +5,17 @@
 
 #ifdef __need_locale_t
 #undef __need_locale_t
+#ifndef _NORLIT_LIBC_LOCALE_H_LOCALE_T
+#define _NORLIT_LIBC_LOCALE_H_LOCALE_T
 // CX Extension
 typedef void* locale_t;
+#endif
 #endif
 
 #ifdef __need_others
 #undef __need_others
+#ifndef _NORLIT_LIBC_LOCALE_H_OTHERS
+#define _NORLIT_LIBC_LOCALE_H_OTHERS
 
 #define __need_NULL
 #include <stddef.h>
@@ -74,5 +76,4 @@ locale_t      newlocale(int, const char *, locale_t);
 locale_t      uselocale(locale_t);
 
 #endif
-
 #endif

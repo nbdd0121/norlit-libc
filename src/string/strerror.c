@@ -1,5 +1,4 @@
 #include <string.h>
-#include <errno.h>
 #include <locale.h>
 
 char *strerror(int errnum) {
