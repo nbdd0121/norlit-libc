@@ -29,7 +29,7 @@ Header               Status
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
 <stdio.h>          Under consideration
-<stdlib.h>         5/39 (ISO C) 2/27 (POSIX)
+<stdlib.h>         13/39 (ISO C) 2/27 (POSIX)
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented** [3]_
 <tgmath.h>         **Freestanding** [2]_
