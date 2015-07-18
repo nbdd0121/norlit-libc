@@ -29,7 +29,7 @@ Header               Status
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
 <stdio.h>          Under consideration
-<stdlib.h>         22/34 (ISO C) 2/27 (POSIX)
+<stdlib.h>         26/34 (ISO C) 2/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented** [3]_
 <tgmath.h>         **Freestanding** [2]_
@@ -46,6 +46,7 @@ Header               Status
 .. [4] Unicode support is under consideration, currently non-ASCII code points will cause these functions to abort.
 .. [5] Conditional features are not in priority
 .. [6] Intended, but violate the standard
+.. [7] long double <-> string conversion is approximated with double <-> string conversion
 
 wchar and uchar
 ===============

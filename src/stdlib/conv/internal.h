@@ -21,4 +21,16 @@ const char* scan_space(const char* str);
 __attribute__((visibility("hidden")))
 int scan_int(const char * restrict nptr, char ** restrict endptr, int base, uint64_t* ret);
 
+__attribute__((visibility("hidden")))
+void desemble_double(double v, uint64_t* s, int* n, int* k);
+
+__attribute__((visibility("hidden")))
+double assemble_double(uint64_t s, int n, int k);
+
+__attribute__((visibility("hidden")))
+double assemble_double_hex(uint64_t s, int n, int k);
+
+__attribute__((visibility("hidden")))
+const char* scan_float(const char* ptr, double* data);
+
 #endif
