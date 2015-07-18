@@ -39,6 +39,18 @@ static inline unsigned long long __double_to_bits(double __f) {
 	return __u.__i;
 }
 
+static inline unsigned short __long_double_exp_to_bits(long double __f) {
+	union {
+		long double __f;
+		struct {
+			unsigned __lo;
+			unsigned __hi;
+			unsigned short __e;
+		};
+	} __u = {__f};
+	return __u.__e;
+}
+
 #define __generic_math(x, func) ( \
 	sizeof(x) == sizeof(float) ? func##f(x) : \
 	sizeof(x) == sizeof(double) ? func(x) : \
@@ -56,7 +68,7 @@ static inline unsigned long long __double_to_bits(double __f) {
 
 #define __signbitf(f) (int)(__float_to_bits(f)>>31)
 #define __signbit(f) (int)(__double_to_bits(f)>>63)
-int __signbitl(long double);
+#define __signbitl(f) (int)(__long_double_exp_to_bits(f)>>15)
 
 #define signbit(x) __generic_math(x, __signbit)
 #define isunordered(x,y) (isnan(x) || isnan(y))
