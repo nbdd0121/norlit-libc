@@ -12,27 +12,27 @@ Header               Status
 <assert.h>         **Implemented** [1]_
 <complex.h>        Under consideration
 <ctype.h>          0/14 (ISO C), 0/16 (POSIX)
-<errno.h>          **Implemented** [2]_
+<errno.h>          **Implemented**
 <fenv.h>           Under consideration
 <float.h>          **Freestanding**
 <inttypes.h>       Under consideration
 <iso646.h>         **Freestanding**
 <limits.h>         **Freestanding**
-<locale.h>         **Implemented** [6]_
+<locale.h>         **Implemented**
 <math.h>           11/69 (ISO C), 0/6 (POSIX)
 <setjmp.h>         Under consideration
 <signal.h>         Under consideration
 <stdalign.h>       **Freestanding**
 <stdarg.h>         **Freestanding**
-<stdatomic.h>      **Freestanding** [3]_
+<stdatomic.h>      **Freestanding** [2]_
 <stdbool.h>        **Freestanding**
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
 <stdio.h>          Under consideration
-<stdlib.h>         5/39 (ISO C) 2/27 (POSIX) [4]_
+<stdlib.h>         5/39 (ISO C) 2/27 (POSIX)
 <stdnoreturn.h>    **Freestanding**
-<string.h>         **Implemented** [5]_
-<tgmath.h>         **Freestanding** [3]_
+<string.h>         **Implemented** [3]_
+<tgmath.h>         **Freestanding** [2]_
 <threads.h>        Under consideration
 <time.h>           Under consideration
 <uchar.h>          Under consideration
@@ -41,8 +41,23 @@ Header               Status
 ================== ===============================
 
 .. [1] No debug message is available yet
-.. [2] errno is not thread-safe yet
-.. [3] In GCC it is available in freestanding environment, though C11 does not require it
-.. [4] Allocation families (malloc, free, calloc, realloc, aligned\_alloc, posix\_memalign) are not thread-safe yet. <sys/wait.h> symbols are not included yet.
-.. [5] Locale-related (strcoll, strxfrm, strcoll\_l, strxfrm\_l) functions and strsignal are stubbed and will abort on call
-.. [6] Only C/POSIX locale is supported. (Affected: strerror\_l)
+.. [2] In GCC it is available in freestanding environment, though C11 does not require it
+.. [3] strsignal are stubbed and will abort on call
+
+Thread-safety
+=============
+
+norlit-libc currently has no need for multi-threading, so thread-safe is not concerned. However, in order to aid furture development, non-thread-safe functions and variables are listed.
+
+- errno
+- uselocale
+- strtok
+- malloc, free, calloc, realloc, aligned_alloc, posix_memalign
+
+
+Locale
+======
+
+norlit-libc currently has no need for locale, so only C/POSIX locale is supported. When implementing norlit-libc, functions use current locale will be redirected to \*_l functions by first retrieving locale by uselocale((locale_t)0). \*_l will do the job instead. Here is the list of \*_l functions
+
+- strcoll_l, strxfrm_l, strerror_l
