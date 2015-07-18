@@ -38,7 +38,7 @@ int   toupper_l(int, locale_t);
 // OB XSI Extensions
 int   isascii(int);
 int   toascii(int);
-#define _toupper toupper
-#define _tolower tolower
+#define _tolower(x) ((x)|0x20)
+#define _toupper(x) ((x)&0x5f)
 
 #endif

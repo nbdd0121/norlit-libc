@@ -11,7 +11,7 @@ Header               Status
 ================== ===============================
 <assert.h>         **Implemented** [1]_
 <complex.h>        Under consideration
-<ctype.h>          0/14 (ISO C), 0/16 (POSIX)
+<ctype.h>          **Implemented** [4]_
 <errno.h>          **Implemented**
 <fenv.h>           Under consideration
 <float.h>          **Freestanding**
@@ -43,6 +43,7 @@ Header               Status
 .. [1] No debug message is available yet
 .. [2] In GCC it is available in freestanding environment, though C11 does not require it
 .. [3] strsignal are stubbed and will abort on call
+.. [4] Unicode support is under consideration, currently non-ASCII code points will cause these functions to abort.
 
 Thread-safety
 =============
