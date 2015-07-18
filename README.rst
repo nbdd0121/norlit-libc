@@ -29,7 +29,7 @@ Header               Status
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
 <stdio.h>          Under consideration
-<stdlib.h>         13/34 (ISO C) 2/27 (POSIX)
+<stdlib.h>         22/34 (ISO C) 2/27 (POSIX)
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented** [3]_
 <tgmath.h>         **Freestanding** [2]_
@@ -62,6 +62,7 @@ Thread-safety
 norlit-libc currently has no need for multi-threading, so thread-safe is not concerned. However, in order to aid future development, non-thread-safe functions and variables are listed.
 
 - errno
+- rand
 - uselocale
 - strtok
 - malloc, free, calloc, realloc, aligned_alloc, posix_memalign
