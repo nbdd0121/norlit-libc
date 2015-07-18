@@ -44,5 +44,5 @@ Header               Status
 .. [2] errno is not thread-safe yet
 .. [3] In GCC it is available in freestanding environment, though C11 does not require it
 .. [4] Allocation families (malloc, free, calloc, realloc, aligned\_alloc, posix\_memalign) are not thread-safe yet. <sys/wait.h> symbols are not included yet.
-.. [5] Locale-related (strcoll, strxfrm, strcoll\_l, strsignal, strxfrm\_l) and errno-related (strerror, strerror\_l, strerror\_r) functions are stubbed and will abort on call
-.. [6] Only C/POSIX locale is supported.
+.. [5] Locale-related (strcoll, strxfrm, strcoll\_l, strxfrm\_l) functions and strsignal are stubbed and will abort on call
+.. [6] Only C/POSIX locale is supported. (Affected: strerror\_l)

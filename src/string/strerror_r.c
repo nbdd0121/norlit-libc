@@ -2,5 +2,6 @@
 #include <assert.h>
 
 int strerror_r(int errnum, char *strerrbuf, size_t buflen) {
-	assert(0);
+	strncpy(stderrbuf, stderror(errnum), buflen);
+	return 0;
 }
