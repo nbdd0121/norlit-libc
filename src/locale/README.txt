@@ -1,0 +1,1 @@
+Locale-related functions' implementation is under this directory. Functions are organized into directories which shares the name of the directory they should be in. (For example, isalpha_l is defined in ctype.h so is put inside ctype/)
