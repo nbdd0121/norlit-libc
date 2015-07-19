@@ -2,7 +2,9 @@
 #define _NORLIT_LIBC_SETJMP_H
 
 typedef struct {
-	unsigned long __registers[6];
+	unsigned long __gp[sizeof(void*) == 4 ? 4 : 6];
+	unsigned long __sp;
+	unsigned long __ip;
 } jmp_buf[1];
 
 void   longjmp(jmp_buf, int);

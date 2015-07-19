@@ -1,3 +1,6 @@
+/bin
+/libc.so
+
 # Object files
 *.o
 *.ko
