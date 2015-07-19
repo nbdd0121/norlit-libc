@@ -11,7 +11,7 @@ Header               Status
 ================== ===============================
 <assert.h>         **Implemented** [1]_
 <complex.h>        **Not supported** [5]_
-<ctype.h>          **Implemented** [4]_
+<ctype.h>          **Implemented**
 <errno.h>          **Implemented**
 <fenv.h>           Under consideration
 <float.h>          **Freestanding**
@@ -43,7 +43,6 @@ Header               Status
 .. [1] No debug message is available yet
 .. [2] In GCC it is available in freestanding environment, though C11 does not require it
 .. [3] getenv and system not implemented
-.. [4] Unicode support is under consideration, currently non-ASCII code points will cause these functions to abort.
 .. [5] Conditional features are not in priority
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
@@ -80,3 +79,4 @@ Locale
 norlit-libc currently has no need for locale, so only C/POSIX locale is supported. When implementing norlit-libc, functions use current locale will be redirected to \*_l functions by first retrieving locale by uselocale((locale_t)0). \*_l will do the job instead. Here is the list of \*_l functions
 
 - strcoll_l, strxfrm_l, strerror_l
+- is*_l defined in ctype.h
