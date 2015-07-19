@@ -1,6 +1,8 @@
 Summary
 =======
 
+norlit-libc is a C library for x86 and x64.
+
 norlit-libc is designed to conform to ISO C standard as well as those
 defined POSIX standard in the standard headers. norlit-libc do not 
 intend to support other POSIX-specific headers, but may create stubs
@@ -20,7 +22,7 @@ Header               Status
 <limits.h>         **Freestanding**
 <locale.h>         **Implemented**
 <math.h>           27/69 (ISO C), 0/6 (POSIX) [4]_
-<setjmp.h>         Under consideration
+<setjmp.h>         **Implemented** (ISO C) 2/4 (POSIX) [8]_
 <signal.h>         Stub
 <stdalign.h>       **Freestanding**
 <stdarg.h>         **Freestanding**
@@ -47,6 +49,7 @@ Header               Status
 .. [5] No debug message is available yet
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
+.. [8] Current there is only x86 support
 
 TODO List
 =========

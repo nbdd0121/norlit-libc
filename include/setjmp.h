@@ -1,0 +1,20 @@
+#ifndef _NORLIT_LIBC_SETJMP_H
+#define _NORLIT_LIBC_SETJMP_H
+
+typedef struct {
+	unsigned long __registers[6];
+} jmp_buf[1];
+
+void   longjmp(jmp_buf, int);
+int    setjmp(jmp_buf);
+
+// Obsolete XSI
+void   _longjmp(jmp_buf, int);
+int    _setjmp(jmp_buf);
+
+// CX Extensions
+// typedef ??? sigjmp_buf
+// void   siglongjmp(sigjmp_buf, int);
+// int    sigsetjmp(sigjmp_buf, int);
+
+#endif
