@@ -42,7 +42,7 @@ Header               Status
 
 .. [1] No debug message is available yet
 .. [2] In GCC it is available in freestanding environment, though C11 does not require it
-.. [3] getenv and system not implemented
+.. [3] Only ``system`` is not implemented
 .. [5] Conditional features are not in priority
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
