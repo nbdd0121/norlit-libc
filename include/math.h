@@ -22,77 +22,25 @@ typedef double double_t;
 
 #define MATH_ERRNO          1
 #define MATH_ERREXCEPT      2
-#define math_errhandling    2
-
-static inline unsigned __float_to_bits(float __f) {
-	union {
-		float __f;
-		unsigned __i;
-	} __u = {__f};
-	return __u.__i;
-}
-static inline unsigned long long __double_to_bits(double __f) {
-	union {
-		double __f;
-		unsigned long long __i;
-	} __u = {__f};
-	return __u.__i;
-}
-
-static inline unsigned short __long_double_exp_to_bits(long double __f) {
-	union {
-		long double __f;
-		struct {
-			unsigned __lo;
-			unsigned __hi;
-			unsigned short __e;
-		};
-	} __u = {__f};
-	return __u.__e;
-}
-
-#define __generic_math(x, func) ( \
-	sizeof(x) == sizeof(float) ? func##f(x) : \
-	sizeof(x) == sizeof(double) ? func(x) : \
-	func##l(x) )
-#define __generic_math_2(x, y, func) ( \
-	sizeof((x) + (y)) == sizeof(float) ? func##f(x, y) : \
-	sizeof((x) + (y)) == sizeof(double) ? func(x, y) : \
-	func##l(x, y) )
+#define math_errhandling    MATH_ERREXCEPT
 
 #define fpclassify(x) __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x)
-#define isinf(x) __builtin_fpclassify(0, 1, 0, 0, 0, x)
-#define isnan(x) __builtin_fpclassify(1, 0, 0, 0, 0, x)
-#define isnormal(x) __builtin_fpclassify(0, 0, 1, 0, 0, x)
-#define isfinite(x) __builtin_fpclassify(0, 0, 1, 1, 1, x)
+#define isinf(x) __builtin_isinf(x)
+#define isnan(x) __builtin_isnan(x)
+#define isnormal(x) __builtin_isnormal(x)
+#define isfinite(x) __builtin_isfinite(x)
 
-#define __signbitf(f) (int)(__float_to_bits(f)>>31)
-#define __signbit(f) (int)(__double_to_bits(f)>>63)
-#define __signbitl(f) (int)(__long_double_exp_to_bits(f)>>15)
+#define signbit(x) _Generic(x, \
+           float: __builtin_signbitf, \
+           double: __builtin_signbit, \
+           long double: __builtin_signbitl)(x)
+#define isunordered(x,y) __builtin_isunordered(x, y)
 
-#define signbit(x) __generic_math(x, __signbit)
-#define isunordered(x,y) (isnan(x) || isnan(y))
-
-#define __define_relation_function(rel, op, type) \
-	static inline int __is##rel(type __x, type __y) { \
-		return !isunordered(__x,__y) && __x op __y; \
-	}
-#define __define_generic_rel_func(rel, op) \
-	__define_relation_function(rel##f, op, float)\
-	__define_relation_function(rel, op, double)\
-	__define_relation_function(rel##l, op, long double)\
-
-__define_generic_rel_func(lessf, < )
-__define_generic_rel_func(lessequalf, <= )
-__define_generic_rel_func(lessgreaterf, != )
-__define_generic_rel_func(greaterf, > )
-__define_generic_rel_func(greaterequalf, >= )
-
-#define isless(x, y)            __generic_math_2(x, y, __isless)
-#define islessequal(x, y)       __generic_math_2(x, y, __islessequal)
-#define islessgreater(x, y)     __generic_math_2(x, y, __islessgreater)
-#define isgreater(x, y)         __generic_math_2(x, y, __isgreater)
-#define isgreaterequal(x, y)    __generic_math_2(x, y, __isgreaterequal)
+#define isless(x, y)            __builtin_isless(x, y)
+#define islessequal(x, y)       __builtin_islessequal(x, y)
+#define islessgreater(x, y)     __builtin_islessgreater(x, y)
+#define isgreater(x, y)         __builtin_isgreater(x, y)
+#define isgreaterequal(x, y)    __builtin_isgreaterequal(x, y)
 
 // XSI Extensions
 #define M_E             2.7182818284590452354

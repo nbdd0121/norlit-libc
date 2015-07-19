@@ -72,4 +72,4 @@ norlit-libc currently has no need for multi-threading, so thread-safe is not con
 Locale
 ======
 
-norlit-libc currently has no need for locale, so only C/POSIX locale is supported. When implementing norlit-libc, functions use current locale will be redirected to \*_l functions by first retrieving locale by uselocale((locale_t)0). \*_l will do the job instead. To support multiple locale, siimply reimplement all files under src/locale
+norlit-libc currently has no need for locale, so only C/POSIX locale is supported. When implementing norlit-libc, functions use current locale will be redirected to \*_l functions by first retrieving locale by uselocale((locale_t)0). \*_l will do the job instead. To support multiple locale, simply reimplement all files under src/locale
