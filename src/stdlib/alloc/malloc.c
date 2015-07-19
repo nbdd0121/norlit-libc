@@ -2,7 +2,6 @@
 #include <errno.h>
 #include "blockalloc.h"
 
-__attribute__((visibility("hidden")))
 allocator_t* allocator_get_global() {
 	static allocator_t* allocator = NULL;
 	if (!allocator) {

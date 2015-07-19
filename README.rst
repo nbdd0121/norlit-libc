@@ -21,7 +21,7 @@ Header               Status
 <locale.h>         **Implemented**
 <math.h>           27/69 (ISO C), 0/6 (POSIX)
 <setjmp.h>         Under consideration
-<signal.h>         Under consideration
+<signal.h>         Stub
 <stdalign.h>       **Freestanding**
 <stdarg.h>         **Freestanding**
 <stdatomic.h>      **Freestanding** [2]_
@@ -50,7 +50,7 @@ Header               Status
 Notice
 ======
 
-- floating point numbers-related functions may have larger margin of error than expected
+- Floating point numbers-related functions may have larger margin of error than expected
 
 wchar and uchar
 ===============
