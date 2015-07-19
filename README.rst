@@ -9,17 +9,17 @@ for them since they are not available in freestanding environment.
 ================== ===============================
 Header               Status
 ================== ===============================
-<assert.h>         **Implemented** [1]_
-<complex.h>        **Not supported** [5]_
+<assert.h>         **Implemented** [5]_
+<complex.h>        **Not supported** [1]_
 <ctype.h>          **Implemented**
 <errno.h>          **Implemented**
 <fenv.h>           Under consideration
 <float.h>          **Freestanding**
-<inttypes.h>       Under consideration
+<inttypes.h>       **Implemented**
 <iso646.h>         **Freestanding**
 <limits.h>         **Freestanding**
 <locale.h>         **Implemented**
-<math.h>           27/69 (ISO C), 0/6 (POSIX)
+<math.h>           27/69 (ISO C), 0/6 (POSIX) [4]_
 <setjmp.h>         Under consideration
 <signal.h>         Stub
 <stdalign.h>       **Freestanding**
@@ -28,29 +28,31 @@ Header               Status
 <stdbool.h>        **Freestanding**
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
-<stdio.h>          Under consideration
-<stdlib.h>         Almost Implemented [3]_ (ISO C) 4/27 (POSIX) [7]_
+<stdio.h>          Planning
+<stdlib.h>         **Implemented** (ISO C) [3]_ 4/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented**
 <tgmath.h>         **Freestanding** [2]_
-<threads.h>        **Not supported** [5]_
+<threads.h>        **Not supported** [1]_
 <time.h>           Under consideration
 <uchar.h>          **Not supported** [6]_
 <wchar.h>          **Not supported** [6]_
 <wctype.h>         **Not supported** [6]_
 ================== ===============================
 
-.. [1] No debug message is available yet
+.. [1] Conditional features are not in priority
 .. [2] In GCC it is available in freestanding environment, though C11 does not require it
-.. [3] Only ``system`` is not implemented
-.. [5] Conditional features are not in priority
+.. [3] ``system`` is a stub and will abort on call
+.. [4] Floating point numbers-related functions may have larger margin of error than expected
+.. [5] No debug message is available yet
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
 
-Notice
-======
+TODO List
+=========
 
-- Floating point numbers-related functions may have larger margin of error than expected
+- Macros in errno.h and signal.h should be system dependent, extract them to include/sys in some way
+- stdio.h
 
 wchar and uchar
 ===============
@@ -60,23 +62,14 @@ norlit-libc currently has no need for uchar and legacy wchar support. Related fu
 - <uchar.h>, <wchar.h> and <wctype.h>
 - mblen, mbtowc, wctomb
 - mbstowcs, wcstombs
+- From <inttypes.h>: wcstoimax, wcstoumax
 
 Thread-safety
 =============
 
-norlit-libc currently has no need for multi-threading, so thread-safe is not concerned. However, in order to aid future development, non-thread-safe functions and variables are listed.
-
-- errno
-- rand
-- uselocale
-- strtok
-- malloc, free, calloc, realloc, aligned_alloc, posix_memalign
-
+norlit-libc currently has no need for multi-threading, so thread-safe is not concerned. If future support for thread-safety is needed, convert all static variables to thread-local storage or add locks to them.
 
 Locale
 ======
 
-norlit-libc currently has no need for locale, so only C/POSIX locale is supported. When implementing norlit-libc, functions use current locale will be redirected to \*_l functions by first retrieving locale by uselocale((locale_t)0). \*_l will do the job instead. Here is the list of \*_l functions
-
-- strcoll_l, strxfrm_l, strerror_l
-- is*_l defined in ctype.h
+norlit-libc currently has no need for locale, so only C/POSIX locale is supported. When implementing norlit-libc, functions use current locale will be redirected to \*_l functions by first retrieving locale by uselocale((locale_t)0). \*_l will do the job instead. To support multiple locale, siimply reimplement all files under src/locale
