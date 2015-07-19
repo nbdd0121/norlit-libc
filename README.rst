@@ -29,9 +29,9 @@ Header               Status
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
 <stdio.h>          Under consideration
-<stdlib.h>         26/34 (ISO C) 2/27 (POSIX) [7]_
+<stdlib.h>         Almost Implemented [3]_ (ISO C) 2/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
-<string.h>         **Implemented** [3]_
+<string.h>         **Implemented**
 <tgmath.h>         **Freestanding** [2]_
 <threads.h>        **Not supported** [5]_
 <time.h>           Under consideration
@@ -42,7 +42,7 @@ Header               Status
 
 .. [1] No debug message is available yet
 .. [2] In GCC it is available in freestanding environment, though C11 does not require it
-.. [3] strsignal are stubbed and will abort on call
+.. [3] getenv and system not implemented
 .. [4] Unicode support is under consideration, currently non-ASCII code points will cause these functions to abort.
 .. [5] Conditional features are not in priority
 .. [6] Intended, but violate the standard
