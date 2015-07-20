@@ -14,7 +14,7 @@
 struct _FILE;
 typedef struct _FILE FILE;
 
-typedef uint64_t fpos_t;
+typedef off_t fpos_t;
 
 #define BUFSIZ 4096
 // L_ctermid
