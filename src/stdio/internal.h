@@ -58,3 +58,6 @@ size_t readBuffer(FILE* restrict f, char* restrict buf, size_t size);
 
 __attribute__((visibility("internal")))
 int readRefill(FILE* f);
+
+__attribute__((visibility("internal")))
+int translateFlags(const char *);
