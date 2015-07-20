@@ -48,4 +48,7 @@ char    *strtok_r(char *restrict, const char *restrict, char **restrict);
 size_t   strxfrm_l(char *restrict, const char *restrict,
                    size_t, locale_t);
 
+// GLIBC Extensions
+void    *memrchr(const void *, int, size_t);
+
 #endif
