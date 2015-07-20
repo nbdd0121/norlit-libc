@@ -30,7 +30,7 @@ Header               Status
 <stdbool.h>        **Freestanding**
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
-<stdio.h>          11/46 (ISO C), 1/22 (POSIX)
+<stdio.h>          21/46 (ISO C), 3/22 (POSIX)
 <stdlib.h>         **Implemented** (ISO C) [3]_ 4/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented**
