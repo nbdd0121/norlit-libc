@@ -30,7 +30,7 @@ Header               Status
 <stdbool.h>        **Freestanding**
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
-<stdio.h>          Planning
+<stdio.h>          7/46 (ISO C), 1/22 (POSIX)
 <stdlib.h>         **Implemented** (ISO C) [3]_ 4/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented**
@@ -67,10 +67,10 @@ norlit-libc currently has no need for uchar and legacy wchar support. Related fu
 - mbstowcs, wcstombs
 - From <inttypes.h>: wcstoimax, wcstoumax
 
-Thread-safety
-=============
+Thread-safety and reentrancy
+============================
 
-norlit-libc currently has no need for multi-threading, so thread-safe is not concerned. If future support for thread-safety is needed, convert all static variables to thread-local storage or add locks to them.
+norlit-libc currently has no need for multi-threading, so thread-safe is not concerned. If future support for thread-safety is needed, convert all static variables to thread-local storage or add locks to them. Reentrancy support is also not considered currently.
 
 Locale
 ======

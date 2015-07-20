@@ -32,4 +32,4 @@ bin/crt/%.o: crt/%.c
 bin/%.o: src/%.c
 	mkdir -p $(dir bin/$*.o)
 	$(CC) -c $(CFLAGS) src/$*.c -o bin/$*.o
-	$(CC) -MM $(CFLAGS) src/$*.c > bin/$*.d
+	$(CC) -MT bin/$*.o -MM $(CFLAGS) src/$*.c > bin/$*.d
