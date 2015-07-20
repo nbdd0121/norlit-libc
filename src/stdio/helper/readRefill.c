@@ -3,12 +3,13 @@
 #include <string.h>
 
 int readRefill(FILE* f) {
-	if (f->bufpos != 0) {
-		memmove(f->buffer, f->buffer + f->bufpos, f->buflim - f->bufpos);
-		f->buflim -= f->bufpos;
-		f->bufpos = 0;
+	if (readMode(f)) return 1;
+
+	if (f->buflim > f->bufpos) {
+		return 0;
 	}
-	f->buflim = f->read(f, f->buffer + f->buflim, f->bufsize - f->buflim);
+	f->bufpos = 0;
+	f->buflim = f->read(f, f->buffer + f->buflim, f->bufsize - 1);
 	if (f->buflim == 0) {
 		return 1;
 	}

@@ -2,6 +2,8 @@
 #include <string.h>
 
 size_t readBuffer(FILE* restrict f, char* restrict buf, size_t size) {
+	if (readMode(f)) return 0;
+
 	size_t totalCount = 0;
 	while (size) {
 		// If something remains in the buffer

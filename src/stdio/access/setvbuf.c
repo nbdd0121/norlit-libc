@@ -10,6 +10,8 @@ int setvbuf(FILE * restrict f, char * restrict buf, int mode, size_t size) {
 	}
 	if (mode == _IONBF) {
 		f->bufpolicy = mode;
+		// In _IONBF mode, bufpos is used for pushbacks
+		f->bufpos = -1;
 		return 0;
 	}
 	if (mode != _IOLBF && mode != _IOFBF) {

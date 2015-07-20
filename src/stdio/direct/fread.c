@@ -21,7 +21,18 @@ size_t fread(void *restrict buf, size_t size, size_t nmemb, FILE *restrict f) {
 			break;
 		case 0:
 		case _IONBF:
-			count = readFully(f, buf, totalSize);
+			// f->bufpos is used for pushback
+			if (f->bufpos != -1) {
+				*(unsigned char*)buf = f->bufpos;
+				f->bufpos = -1;
+				if (totalSize > 1) {
+					count = readFully(f, buf + 1, totalSize - 1) + 1;
+				} else {
+					count = 1;
+				}
+			} else {
+				count = readFully(f, buf, totalSize);
+			}
 			break;
 	}
 	return count == totalSize ? nmemb : count / size;

@@ -9,6 +9,7 @@ int fgetc(FILE *f) {
 			return EOF;
 		}
 	}
+	if (readMode(f)) return EOF;
 	if (f->bufpos >= f->buflim) {
 		if (readRefill(f)) {
 			return EOF;
