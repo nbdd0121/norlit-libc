@@ -15,6 +15,7 @@ struct _FILE {
 
 	int		 bufsize;
 	int      bufpos;
+	int      buflim;
 
 	char    *buffer;
 };
@@ -26,3 +27,34 @@ struct _FILE {
 #define FLAG_ERR 2
 
 #define strong_alias(name, aliasname) __typeof(name) aliasname __attribute__((alias(#name)))
+
+__attribute__((visibility("internal")))
+size_t writeFully(FILE* restrict f, const char* restrict buf, size_t len);
+
+__attribute__((visibility("internal")))
+int writeMode(FILE* f);
+
+static inline int writeFlush(FILE* f) {
+	if (fflush(f) == EOF) return 1;
+	return writeMode(f);
+}
+
+__attribute__((visibility("internal")))
+size_t writeBuffer(FILE* restrict f, const char* restrict buf, size_t len);
+
+__attribute__((visibility("internal")))
+size_t readFully(FILE* restrict, char* restrict, size_t);
+
+__attribute__((visibility("internal")))
+int readMode(FILE*);
+
+static inline int readFlush(FILE* f) {
+	if (fflush(f) == EOF) return 1;
+	return readMode(f);
+}
+
+__attribute__((visibility("internal")))
+size_t readBuffer(FILE* restrict f, char* restrict buf, size_t size);
+
+__attribute__((visibility("internal")))
+int readRefill(FILE* f);

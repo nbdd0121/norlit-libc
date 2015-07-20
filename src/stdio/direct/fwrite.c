@@ -2,41 +2,6 @@
 
 #include <string.h>
 #include <errno.h>
-#include <assert.h>
-
-static int writeMode(FILE* f) {
-	if (f->bufmode == BUFMODE_WRITE)return 0;
-	if (f->bufmode != BUFMODE_WRITE) {
-		if (fflush(f) == EOF) {
-			return 1;
-		}
-	}
-	f->bufmode = BUFMODE_WRITE;
-	return 0;
-}
-
-static int flushWrite(FILE* f) {
-	if (fflush(f) == EOF) return 1;
-	f->bufmode = BUFMODE_WRITE;
-	return 0;
-}
-
-static int bufferedWrite(const void *restrict buf, size_t size, FILE *restrict f) {
-	if (writeMode(f)) return 0;
-
-	// If we run out of buffer space
-	if (f->bufpos + size > f->bufsize) {
-		if (flushWrite(f)) return 0;
-		// If we cannot write to buffer fully
-		if (size > f->bufsize) {
-			return f->write(f, buf, size);
-		}
-	}
-	// Just copy to buffer
-	memcpy(f->buffer + f->bufpos, buf, size);
-	f->bufpos += size;
-	return size;
-}
 
 size_t fwrite(const void *restrict buf, size_t size, size_t nmemb, FILE *restrict f) {
 	// If the stream is already in error state, just return error
@@ -54,23 +19,23 @@ size_t fwrite(const void *restrict buf, size_t size, size_t nmemb, FILE *restric
 			const char* endptr = memrchr(buf, '\n', writeSize);
 			// If no \n, write everything to buffer
 			if (!endptr) {
-				count = bufferedWrite(buf, writeSize, f);
+				count = writeBuffer(f, buf, writeSize);
 				break;
 			}
 			size_t writeCount = endptr - (char*)buf + 1;
-			count = bufferedWrite(buf, writeCount, f);
+			count = writeBuffer(f, buf, writeCount);
 			if (count != writeCount) break;
-			if (flushWrite(f)) break;
-			count += bufferedWrite(buf + writeCount, writeSize - writeCount, f);
+			if (writeFlush(f)) break;
+			count += writeBuffer(f, buf + writeCount, writeSize - writeCount);
 			break;
 		}
 		case 0:
 			setvbuf(f, NULL, _IOFBF, BUFSIZ);
 		case _IOFBF:
-			count = bufferedWrite(buf, writeSize, f);
+			count = writeBuffer(f, buf, writeSize);
 			break;
 		case _IONBF:
-			count = f->write(f, buf, writeSize);
+			count = writeFully(f, buf, writeSize);
 			break;
 	}
 	return count == writeSize ? nmemb : count / size;
