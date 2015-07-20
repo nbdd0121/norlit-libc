@@ -10,6 +10,8 @@ off_t ftello(FILE* f) {
 		} else if (f->bufmode == BUFMODE_WRITE) {
 			pos += f->bufpos;
 		}
+	} else if (f->bufpos != -1) {
+		pos--;
 	}
 
 	return pos;
