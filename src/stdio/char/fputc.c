@@ -1,5 +1,4 @@
 #include "../internal.h"
-#include <string.h>
 
 int fputc(int c, FILE *f) {
 	char ch[1] = {(char)c};
