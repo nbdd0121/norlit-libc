@@ -38,7 +38,11 @@ typedef uint64_t fpos_t;
 
 // P_tmpdir
 
-// TODO: stdin, stdout, stderr
+FILE** __get_std_streams(void);
+
+#define stdin  ((FILE*)__get_std_streams()[0])
+#define stdout ((FILE*)__get_std_streams()[1])
+#define stderr ((FILE*)__get_std_streams()[2])
 
 void     clearerr(FILE *);
 int      fclose(FILE *);
