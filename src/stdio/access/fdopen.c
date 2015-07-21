@@ -38,12 +38,10 @@ FILE *fdopen(int fildes, const char *mode) {
 		return NULL;
 	}
 
-	FILE* f = malloc(sizeof(FILE));
+	FILE* f = allocFile();
 	if (!f) {
 		return NULL;
 	}
-
-	memset(f, 0, sizeof(FILE));
 
 	f->read = fd_read;
 	f->write = fd_write;

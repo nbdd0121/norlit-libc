@@ -1,6 +1,7 @@
 #ifndef _NORLIT_UTIL_LIST_H
 #define _NORLIT_UTIL_LIST_H
 
+#include <stddef.h>
 #include <stdbool.h>
 
 typedef struct str_list_t {

@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <norlit/util/list.h>
+
 struct _FILE {
+	list_t list;
+
 	size_t (*read) (FILE*, char*, size_t);
 	size_t (*write)(FILE*, const char*, size_t);
 	off_t  (*seek) (FILE*, off_t, int);
@@ -61,3 +65,15 @@ int readRefill(FILE* f);
 
 __attribute__((visibility("internal")))
 int translateFlags(const char *);
+
+__attribute__((visibility("internal")))
+extern list_t allFiles;
+
+__attribute__((visibility("internal")))
+FILE* allocFile(void);
+
+__attribute__((visibility("internal")))
+void freeFile(FILE*);
+
+__attribute__((visibility("internal")))
+void moveFile(FILE*, FILE*);

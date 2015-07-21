@@ -6,9 +6,6 @@ int fclose(FILE* f) {
 	if (f->close(f)) {
 		return EOF;
 	}
-	if (f->bufmalloc) {
-		free(f->buffer);
-	}
-	free(f);
+	freeFile(f);
 	return 0;
 }

@@ -7,23 +7,19 @@ FILE *freopen(const char *restrict filename, const char *restrict mode, FILE* re
 	// Force close old FILE*
 	fflush(f);
 	f->close(f);
-	if (f->bufmalloc) {
-		free(f->buffer);
-	}
 
 	if (!filename) {
-		free(f);
+		freeFile(f);
 		errno = ENOSYS;
 		return NULL;
 	}
 
 	FILE* newfile = fopen(filename, mode);
 	if (!newfile) {
-		free(f);
+		freeFile(f);
 		return NULL;
 	}
 
-	memcpy(f, newfile, sizeof(FILE));
-	free(newfile);
+	moveFile(f, newfile);
 	return f;
 }

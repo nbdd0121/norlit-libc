@@ -11,6 +11,8 @@ int open(const char*, int, ...);
 #define O_SEARCH 3
 #define O_WRONLY 4
 
+#define O_ACCMODE 7
+
 #define O_APPEND    8
 #define O_CLOEXEC   16
 #define O_CREAT     32
