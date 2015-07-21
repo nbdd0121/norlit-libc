@@ -127,7 +127,7 @@ static uintmax_t loadQualiferU(va_list* arg, int qualifier) {
 	}
 }
 
-static void reduceSignificantFigures(uint64_t* s, int* n, int* k, int targetFigure) {
+static void reduceSignificantFigures(uint64_t* s, int* n, int* k, int targetFigure, int radix) {
 	uint64_t val = *s;
 	int power = *n;
 	int sigFig = *k;
@@ -138,18 +138,24 @@ static void reduceSignificantFigures(uint64_t* s, int* n, int* k, int targetFigu
 		return;
 	}
 	while (sigFig > targetFigure + 1) {
-		val /= 10;
+		val /= radix;
 		sigFig--;
 	}
 	if (sigFig > targetFigure) {
-		val = (val + 5) / 10;
+		val = (val + radix / 2) / radix;
 		sigFig--;
 
 		// Dealing with carry
 		//   Ex. (5 + 5) / 10 = 1
 		power -= sigFig;
-		sigFig = count_digits(val);
-		power += sigFig;
+		sigFig = 0;
+
+		uint64_t valdup = val;
+		while (valdup) {
+			valdup /= radix;
+			sigFig++;
+			power++;
+		}
 	}
 
 	*s = val;
@@ -191,37 +197,60 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 	}
 
 	uint64_t s; int n; int k;
-	if (val != 0) {
-		desemble_double(val, &s, &n, &k);
-	} else {
-		n = 1;
-		k = 1;
-	}
+
+	int len = 0;
 
 	if (format == 'a') {
-		assert(0);
-	}
+		LongDouble pack = construct_long_double(val);
+		s = pack.frac;
+		n = pack.exp;
 
-	if (precision == -1)
-		precision = 6;
+		s <<= n % 4;
+		n /= 4;
 
-	if (format == 'g') {
-		if (precision == 0) precision = 1;
-		if (precision > n - 1 && n - 1 >= -4) {
-			format = 'f';
-			precision -= n;
-		} else {
-			precision--;
+		while (!(s & 0xF)) {
+			s >>= 4;
+			n++;
 		}
-	}
 
-	int len;
-	if (format == 'f') {
-		reduceSignificantFigures(&s, &n, &k, n + precision);
-		len = (n > 0 ? n : 1) + precision + 1;
+		k = 64 / 4 - count_leading_zeros(s) / 4;
+		n += k;
+
+		if (precision == -1) {
+			precision = k - 1;
+		} else {
+			reduceSignificantFigures(&s, &n, &k, precision + 1, 16);
+		}
+
+		len = 6 + precision + count_digits(abs(n - 1) * 4);
 	} else {
-		reduceSignificantFigures(&s, &n, &k, precision + 1);
-		len = 4 + precision + count_digits(abs(n - 1));
+		if (val != 0) {
+			desemble_double(val, &s, &n, &k);
+		} else {
+			n = 1;
+			k = 1;
+		}
+
+		if (precision == -1)
+			precision = 6;
+
+		if (format == 'g') {
+			if (precision == 0) precision = 1;
+			if (precision > n - 1 && n - 1 >= -4) {
+				format = 'f';
+				precision -= n;
+			} else {
+				precision--;
+			}
+		}
+
+		if (format == 'f') {
+			reduceSignificantFigures(&s, &n, &k, n + precision, 10);
+			len = (n > 0 ? n : 1) + precision + 1;
+		} else {
+			reduceSignificantFigures(&s, &n, &k, precision + 1, 10);
+			len = 4 + precision + count_digits(abs(n - 1));
+		}
 	}
 
 	if (precision == 0 && !(flags & FLAG_ALT_FORM)) {
@@ -230,12 +259,6 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 	}
 
 	len += (neg || (flags & (FLAG_PLUS | FLAG_SPACE)));
-
-	if (s != 0) {
-		formatUnsigned(s, buffer, 10, 0);
-	} else {
-		buffer[0] = '0';
-	}
 
 	if (width > len && !(flags & FLAG_LEFT) && !(flags & FLAG_ZERO))
 		if (pad(f, "        ", width - len)) return EOF;
@@ -251,36 +274,20 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 	if (width > len && !(flags & FLAG_LEFT) && (flags & FLAG_ZERO))
 		if (pad(f, "00000000", width - len)) return EOF;
 
-	if (format == 'f') {
-		if (n > 0) {
-			if (n >= k) {
-				if (!fwrite(buffer, k, 1, f)) return -1;
-				if (pad(f, "00000000", n - k)) return -1;
-				if (precision == -1) goto ret;
-				if (fputc('.', f)) return -1;
-				if (pad(f, "00000000", precision)) return -1;
-			} else {
-				if (!fwrite(buffer, n, 1, f)) return -1;
-				if (precision == -1) goto ret;
-				if (fputc('.', f)) return -1;
-				if (!fwrite(buffer + n, k - n, 1, f)) return -1;
-				if (pad(f, "00000000", precision - (k - n))) return -1;
-			}
-		} else {
-			if (fputc('0', f)) return -1;
-			if (fputc('.', f)) return -1;
-			if (pad(f, "00000000", -n)) return -1;
-			if (!fwrite(buffer, k, 1, f)) return -1;
-			if (pad(f, "00000000", precision - (k - n))) return -1;
-		}
-	} else {
+
+	if (format == 'a') {
+		if (fputc('0', f)) return -1;
+		if (fputc(upperCase ? 'X' : 'x', f)) return -1;
+
+		formatUnsigned(s, buffer, 16, upperCase ? 0 : FLAG_LITTLE);
+
 		if (fputc(*buffer, f)) return -1;
 		if (precision != -1) {
 			if (fputc('.', f)) return -1;
 			if (!fwrite(buffer + 1, k - 1, 1, f)) return -1;
 			if (pad(f, "00000000", precision - (k - 1))) return -1;
 		}
-		if (fputc(upperCase ? 'E' : 'e', f)) return -1;
+		if (fputc(upperCase ? 'P' : 'p', f)) return -1;
 		n--;
 		if (n < 0) {
 			if (fputc('-', f)) return -1;
@@ -289,10 +296,61 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 			if (fputc('+', f)) return -1;
 		}
 		if (n != 0) {
-			int explen = formatUnsigned(n, buffer, 10, 0);
+			int explen = formatUnsigned(n * 4, buffer, 10, 0);
 			if (!fwrite(buffer, explen, 1, f)) return -1;
 		} else {
 			if (fputc('0', f)) return -1;
+		}
+	} else {
+		if (s != 0) {
+			formatUnsigned(s, buffer, 10, 0);
+		} else {
+			buffer[0] = '0';
+		}
+
+		if (format == 'f') {
+			if (n > 0) {
+				if (n >= k) {
+					if (!fwrite(buffer, k, 1, f)) return -1;
+					if (pad(f, "00000000", n - k)) return -1;
+					if (precision == -1) goto ret;
+					if (fputc('.', f)) return -1;
+					if (pad(f, "00000000", precision)) return -1;
+				} else {
+					if (!fwrite(buffer, n, 1, f)) return -1;
+					if (precision == -1) goto ret;
+					if (fputc('.', f)) return -1;
+					if (!fwrite(buffer + n, k - n, 1, f)) return -1;
+					if (pad(f, "00000000", precision - (k - n))) return -1;
+				}
+			} else {
+				if (fputc('0', f)) return -1;
+				if (fputc('.', f)) return -1;
+				if (pad(f, "00000000", -n)) return -1;
+				if (!fwrite(buffer, k, 1, f)) return -1;
+				if (pad(f, "00000000", precision - (k - n))) return -1;
+			}
+		} else {
+			if (fputc(*buffer, f)) return -1;
+			if (precision != -1) {
+				if (fputc('.', f)) return -1;
+				if (!fwrite(buffer + 1, k - 1, 1, f)) return -1;
+				if (pad(f, "00000000", precision - (k - 1))) return -1;
+			}
+			if (fputc(upperCase ? 'E' : 'e', f)) return -1;
+			n--;
+			if (n < 0) {
+				if (fputc('-', f)) return -1;
+				n = -n;
+			} else {
+				if (fputc('+', f)) return -1;
+			}
+			if (n != 0) {
+				int explen = formatUnsigned(n, buffer, 10, 0);
+				if (!fwrite(buffer, explen, 1, f)) return -1;
+			} else {
+				if (fputc('0', f)) return -1;
+			}
 		}
 	}
 

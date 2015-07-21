@@ -10,7 +10,7 @@ static inline uint64_t roundedSHR(uint64_t operand, uint8_t count) {
     return operand;
 }
 
-static uint8_t countLeadingZeros(uint64_t operand) {
+uint8_t count_leading_zeros(uint64_t operand) {
     uint8_t leadingZero = 0;
     while (!(operand & 0x8000000000000000ULL)) {
         operand <<= 1;
@@ -19,13 +19,7 @@ static uint8_t countLeadingZeros(uint64_t operand) {
     return leadingZero;
 }
 
-// This struct is the diy_fp in Florian Loitsch's paper
-typedef struct {
-    uint64_t frac;
-    int16_t exp;
-} LongDouble;
-
-static LongDouble construct(double val) {
+LongDouble construct_long_double(double val) {
     LongDouble self;
     union {
         uint64_t i;
@@ -44,8 +38,8 @@ static LongDouble construct(double val) {
     return self;
 }
 
-static LongDouble normalize(LongDouble self) {
-    uint8_t shift = countLeadingZeros(self.frac);
+static LongDouble normalize_long_double(LongDouble self) {
+    uint8_t shift = count_leading_zeros(self.frac);
     return (LongDouble) { self.frac << shift, self.exp - shift };
 }
 
@@ -69,7 +63,7 @@ static LongDouble multiply(LongDouble a, LongDouble b) {
 static double extract(LongDouble self) {
     uint64_t frac = self.frac;
     int16_t exp = self.exp;
-    uint8_t leadingZeros = countLeadingZeros(frac);
+    uint8_t leadingZeros = count_leading_zeros(frac);
     if (leadingZeros > 11) {
         frac <<= (leadingZeros - 11);
         exp -= (leadingZeros - 11);
@@ -149,9 +143,9 @@ void desemble_double(double v, uint64_t* s, int* n, int* k) {
     // This is Grisu2 with Alpha = 0, Gamma = 3
 
     // Convert v to long double
-    LongDouble Dexact = construct(v);
+    LongDouble Dexact = construct_long_double(v);
     // Half way between v and successor double value
-    LongDouble upperBoundary = normalize((LongDouble) {(Dexact.frac << 1) + 1, Dexact.exp - 1});
+    LongDouble upperBoundary = normalize_long_double((LongDouble) {(Dexact.frac << 1) + 1, Dexact.exp - 1});
     // Half way between v and predecessor double value
     LongDouble lowerBoundary = (LongDouble) {
         Dexact.frac == 0x8000000000000000ULL ?
@@ -167,8 +161,8 @@ void desemble_double(double v, uint64_t* s, int* n, int* k) {
     upperBoundary = multiply(upperBoundary, c_mk);
     int power = -mk;
 
-    //lowerBoundary = lowerBoundary.normalize();
-    //upperBoundary = upperBoundary.normalize();
+    //lowerBoundary = lowerBoundary.normalize_long_double();
+    //upperBoundary = upperBoundary.normalize_long_double();
 
     // upperBoundary.exp can sometimes be 1
     if (upperBoundary.exp > 0) {
@@ -218,7 +212,7 @@ double assemble_double(uint64_t s, int n, int k) {
     } else if (n < -343 || s == 0 ) {
         return 0;
     }
-    LongDouble number = normalize((LongDouble) {s, 0});
+    LongDouble number = normalize_long_double((LongDouble) {s, 0});
     number = multiply(number, getPower(n));
     return extract(number);
 }
@@ -231,6 +225,6 @@ double assemble_double_hex(uint64_t s, int n, int k) {
     if (n < -1139 || s == 0) {
         return 0;
     }
-    LongDouble number = normalize((LongDouble) {s, n});
+    LongDouble number = normalize_long_double((LongDouble) {s, n});
     return extract(number);
 }
