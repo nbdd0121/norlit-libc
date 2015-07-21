@@ -22,6 +22,9 @@ __attribute__((visibility("internal")))
 int scan_int(const char * restrict nptr, char ** restrict endptr, int base, unsigned long long* ret);
 
 __attribute__((visibility("internal")))
+uint8_t count_digits(uint64_t n);
+
+__attribute__((visibility("internal")))
 void desemble_double(double v, uint64_t* s, int* n, int* k);
 
 __attribute__((visibility("internal")))

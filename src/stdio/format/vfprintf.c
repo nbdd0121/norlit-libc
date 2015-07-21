@@ -3,6 +3,10 @@
 #include <stddef.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <ctype.h>
+#include <math.h>
+#include <stdbool.h>
+#include "../../stdlib/conv/internal.h"
 
 enum {
 	FLAG_LEFT = 1,
@@ -28,7 +32,6 @@ static int formatUnsigned(uintmax_t num, char *str, uint8_t radix, int flags) {
 		str[j] = str[i - 1 - j];
 		str[i - 1 - j] = temp;
 	}
-	str[i] = 0;
 	return i;
 }
 
@@ -121,6 +124,154 @@ static uintmax_t loadQualiferU(va_list* arg, int qualifier) {
 		default:
 			return va_arg(*arg, unsigned);
 	}
+}
+
+static int formatDouble(FILE* f, char* buffer, int format, int flags, int width, int precision, double val) {
+	bool upperCase = isupper(format);
+	format = tolower(format);
+
+	bool neg = signbit(val);
+
+	if (!isfinite(val)) {
+		bool nanFlag = isnan(val);
+		int len = (neg || (flags & (FLAG_PLUS | FLAG_SPACE))) + nanFlag ? 3 : 8;
+		if (width > len && !(flags & FLAG_LEFT)) if (pad(f, "        ", width - len)) return EOF;
+
+		if (neg) {
+			if (fputc('-', f)) return EOF;
+		} else if (flags & FLAG_PLUS) {
+			if (fputc('+', f)) return EOF;
+		} else if (flags & FLAG_SPACE) {
+			if (fputc(' ', f)) return EOF;
+		}
+
+		if (nanFlag) {
+			if (!fwrite("nanNAN" + upperCase * 3, 3, 1, f)) return EOF;
+		} else {
+			if (!fwrite("infinityINFINITY" + upperCase * 8, 8, 1, f)) return EOF;
+		}
+
+		if (width > len && (flags & FLAG_LEFT)) if (pad(f, "        ", width - len)) return EOF;
+		return width > len ? width : len;
+	}
+
+	if (neg) {
+		val = -val;
+	}
+
+	uint64_t s; int n; int k;
+	if (val != 0) {
+		desemble_double(val, &s, &n, &k);
+	} else {
+		n = 1;
+		k = 1;
+	}
+
+	if (format == 'a') {
+		assert(0);
+	}
+
+	if (precision == -1)
+		precision = 6;
+
+	if (format == 'g') {
+		if (precision == 0) precision = 1;
+		if (precision > n - 1 && n - 1 >= -4) {
+			format = 'f';
+			precision -= n;
+		} else {
+			precision--;
+		}
+	}
+
+	int len;
+	if (format == 'f') {
+		while (k - n - 1 > precision) {
+			s /= 10;
+			k--;
+		}
+		if (k - n > precision) {
+			s = (s + 5) / 10;
+			k--;
+		}
+		len = n + precision + 1;
+	} else {
+		while (k - 2 > precision) {
+			s /= 10;
+			k--;
+		}
+		if (k - 1 > precision) {
+			s = (s + 5) / 10;
+			k--;
+		}
+		len = 4 + precision + count_digits(abs(n - 1));
+	}
+
+	len += (neg || (flags & (FLAG_PLUS | FLAG_SPACE)));
+
+	if (val != 0) {
+		formatUnsigned(s, buffer, 10, 0);
+	} else {
+		buffer[0] = '0';
+	}
+
+	if (width > len && !(flags & FLAG_LEFT) && !(flags & FLAG_ZERO))
+		if (pad(f, "        ", width - len)) return EOF;
+
+	if (neg) {
+		if (fputc('-', f)) return EOF;
+	} else if (flags & FLAG_PLUS) {
+		if (fputc('+', f)) return EOF;
+	} else if (flags & FLAG_SPACE) {
+		if (fputc(' ', f)) return EOF;
+	}
+
+	if (width > len && !(flags & FLAG_LEFT) && (flags & FLAG_ZERO))
+		if (pad(f, "00000000", width - len)) return EOF;
+
+	if (format == 'f') {
+		if (n >= k) {
+			if (!fwrite(buffer, k, 1, f)) return -1;
+			if (pad(f, "00000000", n - k)) return -1;
+			if (precision == 0 && !(flags & FLAG_ALT_FORM)) return n;
+			if (fputc('.', f)) return -1;
+			if (pad(f, "00000000", precision)) return -1;
+		} else {
+			if (!fwrite(buffer, n, 1, f)) return -1;
+			if (precision == 0 && !(flags & FLAG_ALT_FORM)) return n;
+			if (fputc('.', f)) return -1;
+			if (!fwrite(buffer + n, k - n, 1, f)) return -1;
+			if (pad(f, "00000000", precision - (k - n))) return -1;
+		}
+	} else {
+		if (fputc(*buffer, f)) return -1;
+		if (precision == 0 && !(flags & FLAG_ALT_FORM)) {
+			precision--;
+		} else {
+			if (fputc('.', f)) return -1;
+			if (!fwrite(buffer + 1, k - 1, 1, f)) return -1;
+			if (pad(f, "00000000", precision - (k - 1))) return -1;
+		}
+		if (fputc(upperCase ? 'E' : 'e', f)) return -1;
+		n--;
+		if (n < 0) {
+			if (fputc('-', f)) return -1;
+			n = -n;
+		} else {
+			if (fputc('+', f)) return -1;
+		}
+		if (n != 0) {
+			int explen = formatUnsigned(n, buffer, 10, 0);
+			if (!fwrite(buffer, explen, 1, f)) return -1;
+		} else {
+			if (fputc('0', f)) return -1;
+		}
+	}
+
+	if (width > len && (flags & FLAG_LEFT))
+		if (pad(f, "        ", width - len)) return EOF;
+
+	return width > len ? width : len;
 }
 
 
@@ -295,9 +446,14 @@ unsignedFormatting: {
 			case 'g':
 			case 'G':
 			case 'a':
-			case 'A':
-				assert(0);
-				break;
+			case 'A': {
+				int ret = formatDouble(f, buf, *format, flags, width, precision, qualifier == 'L' ? (double)va_arg(args, long double) : va_arg(args, double));
+				if (ret == -1)
+					return EOF;
+				totalCount += ret;
+				continue;
+			}
+			break;
 			case 'c': {
 				if (qualifier != 'l') {
 					buf[0] = (char)va_arg(args, int);

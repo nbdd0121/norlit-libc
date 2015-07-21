@@ -124,7 +124,7 @@ static uint64_t average(uint64_t a, uint64_t b) {
     return (a & b) + ((a ^ b) >> 1);
 }
 
-static uint8_t countDigits(uint64_t n) {
+uint8_t count_digits(uint64_t n) {
     if (n < 10) return 1;
     if (n < 100) return 2;
     if (n < 1000) return 3;
@@ -207,7 +207,7 @@ void desemble_double(double v, uint64_t* s, int* n, int* k) {
     }
 
     *s = lowerBound;
-    *k = countDigits(lowerBound);
+    *k = count_digits(lowerBound);
     *n = power + *k;
 }
 
