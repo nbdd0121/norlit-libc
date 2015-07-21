@@ -33,7 +33,7 @@ static int fd_close(FILE* f) {
 }
 
 FILE *fdopen(int fildes, const char *mode) {
-	if (!strchr("rwa", mode[0])) {
+	if (translateFlags(mode) < 0) {
 		errno = EINVAL;
 		return NULL;
 	}
@@ -49,6 +49,8 @@ FILE *fdopen(int fildes, const char *mode) {
 	f->close = fd_close;
 
 	f->fildes = fildes;
+
+	f->bufmode = _IOFBF;
 
 	return f;
 }

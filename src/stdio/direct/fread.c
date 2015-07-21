@@ -4,6 +4,8 @@
 #include <errno.h>
 
 size_t fread(void *restrict buf, size_t size, size_t nmemb, FILE *restrict f) {
+	checkFile(f);
+
 	// If the stream is already in error state, just return error
 	if (f->flags & (FLAG_ERR | FLAG_EOF)) {
 		errno = EIO; // TODO
@@ -19,7 +21,6 @@ size_t fread(void *restrict buf, size_t size, size_t nmemb, FILE *restrict f) {
 		case _IOFBF:
 			count = readBuffer(f, buf, totalSize);
 			break;
-		case 0:
 		case _IONBF:
 			// f->bufpos is used for pushback
 			if (f->bufpos != -1) {

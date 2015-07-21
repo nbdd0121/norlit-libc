@@ -1,6 +1,8 @@
 #include "../internal.h"
 
 int fgetc(FILE *f) {
+	checkFile(f);
+
 	if (f->bufpolicy == _IONBF) {
 		char ch[1];
 		if (fread(ch, 1, 1, f)) {

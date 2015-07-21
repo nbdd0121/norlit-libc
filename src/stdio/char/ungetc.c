@@ -2,6 +2,8 @@
 #include <string.h>
 
 int ungetc(int c, FILE *f) {
+	checkFile(f);
+
 	if (f->bufpolicy == _IONBF) {
 		if (f->bufpos == -1) {
 			f->bufpos = (unsigned char)c;

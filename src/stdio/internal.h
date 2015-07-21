@@ -4,23 +4,27 @@
 #include <norlit/util/list.h>
 
 struct _FILE {
-	list_t list;
+	list_t   list;
 
 	size_t (*read) (FILE*, char*, size_t);
 	size_t (*write)(FILE*, const char*, size_t);
 	off_t  (*seek) (FILE*, off_t, int);
 	int    (*close)(FILE*);
+
+	void    *additionalData;
+
 	int      fildes;
 	int      flags;
 
 	unsigned bufpolicy: 2;
+	// Additional usage: This is used to store default bufpolicy when bufpolicy == 0
 	unsigned bufmode  : 2;
 	unsigned bufmalloc: 1;
 
-	int		 bufsize;
+	size_t   bufsize;
+	// Additional usage: This is used as pushback of _IONBF stream
 	int      bufpos;
 	int      buflim;
-
 	char    *buffer;
 };
 
@@ -77,3 +81,6 @@ void freeFile(FILE*);
 
 __attribute__((visibility("internal")))
 void moveFile(FILE*, FILE*);
+
+__attribute__((visibility("internal")))
+int checkFile(FILE*);
