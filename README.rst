@@ -30,7 +30,7 @@ Header               Status
 <stdbool.h>        **Freestanding**
 <stddef.h>         **Freestanding**
 <stdint.h>         **Freestanding**
-<stdio.h>          24/46 (ISO C), 3/22 (POSIX)
+<stdio.h>          32/46 (ISO C) [9]_ , 3/22 (POSIX)
 <stdlib.h>         **Implemented** (ISO C) [3]_ 4/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
 <string.h>         **Implemented**
@@ -50,6 +50,7 @@ Header               Status
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
 .. [8] Current there is only x86 support
+.. [9] Floating point output is not yet supported
 
 TODO List
 =========
