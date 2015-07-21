@@ -8,8 +8,8 @@ void *memmove(void *s1, const void *s2, size_t n) {
 			*dst = *src;
 		}
 	} else {
-		dst += n;
-		src += n;
+		dst += n - 1;
+		src += n - 1;
 		for (size_t i = 0; i < n; i++, dst--, src--) {
 			*dst = *src;
 		}

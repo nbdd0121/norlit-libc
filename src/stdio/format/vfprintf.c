@@ -10,13 +10,16 @@ enum {
 	FLAG_SPACE = 4,
 	FLAG_ALT_FORM = 8,
 	FLAG_ZERO = 16,
-	FLAG_LITTLE = 32
+	FLAG_LITTLE = 32,
+	FLAG_THOUSANDS = 64,
 };
 
 static int formatUnsigned(uintmax_t num, char *str, uint8_t radix, int flags) {
 	const char *index = (flags & FLAG_LITTLE) ? "0123456789abcdefghijklmnopqrstuvwxyz" : "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	int i = 0;
 	while (num) {
+		if ((flags & FLAG_THOUSANDS) && i % 4 == 3)
+			str[i++] = ',';
 		str[i++] = index[num % radix];
 		num /= radix;
 	}
@@ -152,6 +155,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 				case ' ': flags |= FLAG_SPACE; continue;
 				case '#': flags |= FLAG_ALT_FORM; continue;
 				case '0': flags |= FLAG_ZERO; continue;
+				case '\'': flags |= FLAG_THOUSANDS; continue;
 			}
 			break;
 		}
@@ -219,7 +223,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 			case 'L': qualifier = *(format++);
 		}
 
-		char buf[sizeof(intmax_t) * 3];
+		char buf[sizeof(intmax_t) * 4];
 
 		char *prefix = NULL;
 		int   prefixLen = 0;
@@ -243,20 +247,23 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 					prefix = "+";
 					prefixLen = 1;
 				}
-				bodyLen = formatUnsigned(val, buf, 10, 0);
+				bodyLen = formatUnsigned(val, buf, 10, flags);
 				if (precision == -1)
 					precision = 1;
 				break;
 			}
-			case 'p':
-				base = 16;
+			case 'p': {
 				prefix = "0x";
 				prefixLen = 2;
+				uintmax_t val = (uintptr_t)va_arg(args, void*);
+				bodyLen = formatUnsigned(val, buf, 16, 0);
 				if (precision < (int)sizeof(uintptr_t) * 2)
 					precision = sizeof(uintptr_t) * 2;
-				goto unsignedFormatting;
+				break;
+			}
 			case 'o':
 				base = 8;
+				flags &= ~FLAG_THOUSANDS;
 				if (flags & FLAG_ALT_FORM) {
 					prefix = "0";
 					prefixLen = 1;
@@ -266,6 +273,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 				flags |= FLAG_LITTLE;
 			case 'X':
 				base = 16;
+				flags &= ~FLAG_THOUSANDS;
 				if (flags & FLAG_ALT_FORM) {
 					prefix = flags & FLAG_LITTLE ? "0x" : "0X";
 					prefixLen = 2;
@@ -291,28 +299,30 @@ unsignedFormatting: {
 				assert(0);
 				break;
 			case 'c': {
-				if (qualifier == 'l') {
-					assert(0);
+				if (qualifier != 'l') {
+					buf[0] = (char)va_arg(args, int);
+					bodyLen = 1;
+					// 0 for %c is ignored
+					flags &= ~FLAG_ZERO;
+					precision = -1;
+					break;
 				}
-				buf[0] = (char)va_arg(args, int);
-				bodyLen = 1;
-				// 0 for %c is ignored
-				flags &= ~FLAG_ZERO;
-				precision = -1;
-				break;
 			}
+			case 'C':
+				assert(0);
 			case 's': {
-				if (qualifier == 'l') {
-					assert(0);
+				if (qualifier != 'l') {
+					body = va_arg(args, char*);
+					if (!body) body = "(null)";
+					bodyLen = precision == -1 ? strlen(body) : strnlen(body, precision);
+					// 0 for %s is ignored
+					flags &= ~FLAG_ZERO;
+					precision = -1;
+					break;
 				}
-				body = va_arg(args, char*);
-				if (!body) body = "(null)";
-				bodyLen = precision == -1 ? strlen(body) : strnlen(body, precision);
-				// 0 for %s is ignored
-				flags &= ~FLAG_ZERO;
-				precision = -1;
-				break;
 			}
+			case 'S':
+				assert(0);
 			case 'n':
 				storeQualifierD(va_arg(args, void*), qualifier, totalCount);
 				continue;
