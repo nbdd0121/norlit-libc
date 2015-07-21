@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <inttypes.h>
 #include <ctype.h>
@@ -126,6 +127,36 @@ static uintmax_t loadQualiferU(va_list* arg, int qualifier) {
 	}
 }
 
+static void reduceSignificantFigures(uint64_t* s, int* n, int* k, int targetFigure) {
+	uint64_t val = *s;
+	int power = *n;
+	int sigFig = *k;
+	if (targetFigure < 0) {
+		*s = 0;
+		*n = 1;
+		*k = 1;
+		return;
+	}
+	while (sigFig > targetFigure + 1) {
+		val /= 10;
+		sigFig--;
+	}
+	if (sigFig > targetFigure) {
+		val = (val + 5) / 10;
+		sigFig--;
+
+		// Dealing with carry
+		//   Ex. (5 + 5) / 10 = 1
+		power -= sigFig;
+		sigFig = count_digits(val);
+		power += sigFig;
+	}
+
+	*s = val;
+	*n = power;
+	*k = sigFig;
+}
+
 static int formatDouble(FILE* f, char* buffer, int format, int flags, int width, int precision, double val) {
 	bool upperCase = isupper(format);
 	format = tolower(format);
@@ -186,30 +217,21 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 
 	int len;
 	if (format == 'f') {
-		while (k - n - 1 > precision) {
-			s /= 10;
-			k--;
-		}
-		if (k - n > precision) {
-			s = (s + 5) / 10;
-			k--;
-		}
-		len = n + precision + 1;
+		reduceSignificantFigures(&s, &n, &k, n + precision);
+		len = (n > 0 ? n : 1) + precision + 1;
 	} else {
-		while (k - 2 > precision) {
-			s /= 10;
-			k--;
-		}
-		if (k - 1 > precision) {
-			s = (s + 5) / 10;
-			k--;
-		}
+		reduceSignificantFigures(&s, &n, &k, precision + 1);
 		len = 4 + precision + count_digits(abs(n - 1));
+	}
+
+	if (precision == 0 && !(flags & FLAG_ALT_FORM)) {
+		precision = -1;
+		len--;
 	}
 
 	len += (neg || (flags & (FLAG_PLUS | FLAG_SPACE)));
 
-	if (val != 0) {
+	if (s != 0) {
 		formatUnsigned(s, buffer, 10, 0);
 	} else {
 		buffer[0] = '0';
@@ -230,24 +252,30 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 		if (pad(f, "00000000", width - len)) return EOF;
 
 	if (format == 'f') {
-		if (n >= k) {
-			if (!fwrite(buffer, k, 1, f)) return -1;
-			if (pad(f, "00000000", n - k)) return -1;
-			if (precision == 0 && !(flags & FLAG_ALT_FORM)) return n;
-			if (fputc('.', f)) return -1;
-			if (pad(f, "00000000", precision)) return -1;
+		if (n > 0) {
+			if (n >= k) {
+				if (!fwrite(buffer, k, 1, f)) return -1;
+				if (pad(f, "00000000", n - k)) return -1;
+				if (precision == -1) goto ret;
+				if (fputc('.', f)) return -1;
+				if (pad(f, "00000000", precision)) return -1;
+			} else {
+				if (!fwrite(buffer, n, 1, f)) return -1;
+				if (precision == -1) goto ret;
+				if (fputc('.', f)) return -1;
+				if (!fwrite(buffer + n, k - n, 1, f)) return -1;
+				if (pad(f, "00000000", precision - (k - n))) return -1;
+			}
 		} else {
-			if (!fwrite(buffer, n, 1, f)) return -1;
-			if (precision == 0 && !(flags & FLAG_ALT_FORM)) return n;
+			if (fputc('0', f)) return -1;
 			if (fputc('.', f)) return -1;
-			if (!fwrite(buffer + n, k - n, 1, f)) return -1;
+			if (pad(f, "00000000", -n)) return -1;
+			if (!fwrite(buffer, k, 1, f)) return -1;
 			if (pad(f, "00000000", precision - (k - n))) return -1;
 		}
 	} else {
 		if (fputc(*buffer, f)) return -1;
-		if (precision == 0 && !(flags & FLAG_ALT_FORM)) {
-			precision--;
-		} else {
+		if (precision != -1) {
 			if (fputc('.', f)) return -1;
 			if (!fwrite(buffer + 1, k - 1, 1, f)) return -1;
 			if (pad(f, "00000000", precision - (k - 1))) return -1;
@@ -271,6 +299,7 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 	if (width > len && (flags & FLAG_LEFT))
 		if (pad(f, "        ", width - len)) return EOF;
 
+ret:
 	return width > len ? width : len;
 }
 

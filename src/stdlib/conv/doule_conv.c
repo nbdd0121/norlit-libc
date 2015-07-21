@@ -224,12 +224,13 @@ double assemble_double(uint64_t s, int n, int k) {
 }
 
 double assemble_double_hex(uint64_t s, int n, int k) {
-    if (n > 343) {
+    n -= k * 4;
+    if (n > 1023) {
         return INFINITY;
-    } else if (n < -343 || s == 0 ) {
+    }
+    if (n < -1139 || s == 0) {
         return 0;
     }
-    LongDouble number = normalize((LongDouble) {s, -k * 4});
-    number = multiply(number, getPower(n));
+    LongDouble number = normalize((LongDouble) {s, n});
     return extract(number);
 }
