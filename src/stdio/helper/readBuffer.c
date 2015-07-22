@@ -12,12 +12,14 @@ size_t readBuffer(FILE* restrict f, char* restrict buf, size_t size) {
 			// If buffer has more than we need
 			if (bufremain > size) {
 				memcpy(buf, f->buffer + f->bufpos, size);
+				f->bufpos += size;
 				return size + totalCount;
 			}
 			memcpy(buf, f->buffer + f->bufpos, bufremain);
 			totalCount += bufremain;
 			buf += bufremain;
 			size -= bufremain;
+			f->bufpos += bufremain;
 		}
 		if (size > f->bufsize) {
 			return totalCount + readFully(f, buf, size);
