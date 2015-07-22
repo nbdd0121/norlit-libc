@@ -9,5 +9,8 @@ unsigned long strtoul(const char * restrict nptr, char ** restrict endptr, int b
 		errno = -sign;
 		return sign == -ERANGE ? ULONG_MAX : ret;
 	}
+	if (ret > ULONG_MAX) {
+		ret = ULONG_MAX;
+	}
 	return (unsigned long)(sign ? -ret : ret);
 }

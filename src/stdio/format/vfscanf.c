@@ -7,31 +7,83 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <limits.h>
+
+#include "../conv/internal.h"
+
+#define _limit(val, min, max) (val>max?max:(val<min?min:val))
+#define limit(val, limname) _limit(val, limname##_MIN, limname##_MAX)
+#define _ulimit(val, max) (val>max?max:val)
+#define ulimit(val, limname) _ulimit(val, limname##_MAX)
+
 static void storeQualifierD(void* ptr, int qualifier, intmax_t data) {
 	switch (qualifier) {
 		case 'H':
-			*(signed char*)ptr = (signed char)data;
+			*(signed char*)ptr = (signed char)limit(data, SCHAR);
 			break;
 		case 'h':
-			*(short*)ptr = (short)data;
+			*(short*)ptr = (short)limit(data, SHRT);
 			break;
 		case 'l':
-			*(long*)ptr = (long)data;
+			*(long*)ptr = (long)limit(data, LONG);
 			break;
 		case 'L':
-			*(long long*)ptr = (long long)data;
+			*(long long*)ptr = (long long)limit(data, LLONG);
 			break;
 		case 'j':
 			*(intmax_t*)ptr = data;
 			break;
 		case 'z':
-			*(size_t*)ptr = (size_t)data;
+			*(ssize_t*)ptr = (ssize_t)limit(data, INTPTR);
 			break;
 		case 't':
-			*(ptrdiff_t*)ptr = (ptrdiff_t)data;
+			*(ptrdiff_t*)ptr = (ptrdiff_t)limit(data, INTPTR);
 			break;
 		default:
-			*(int*)ptr = (int)data;
+			*(int*)ptr = (int)limit(data, INT);
+			break;
+	}
+}
+
+static void storeQualifierU(void* ptr, int qualifier, uintmax_t data) {
+	switch (qualifier) {
+		case 'H':
+			*(unsigned char*)ptr = (unsigned char)ulimit(data, UCHAR);
+			break;
+		case 'h':
+			*(unsigned short*)ptr = (unsigned short)ulimit(data, USHRT);
+			break;
+		case 'l':
+			*(unsigned long*)ptr = (unsigned long)ulimit(data, ULONG);
+			break;
+		case 'L':
+			*(unsigned long long*)ptr = (unsigned long long)ulimit(data, ULLONG);
+			break;
+		case 'j':
+			*(uintmax_t*)ptr = data;
+			break;
+		case 'z':
+			*(size_t*)ptr = (size_t)ulimit(data, UINTPTR);
+			break;
+		case 't':
+			*(ptrdiff_t*)ptr = (ptrdiff_t)limit(data, INTPTR);
+			break;
+		default:
+			*(unsigned int*)ptr = (unsigned int)ulimit(data, UINT);
+			break;
+	}
+}
+
+static void storeQualifierF(void* ptr, int qualifier, double data) {
+	switch (qualifier) {
+		case 'l':
+			*(double*)ptr = (double)data;
+			break;
+		case 'L':
+			*(long double*)ptr = (long double)data;
+			break;
+		default:
+			*(float*)ptr = (float)data;
 			break;
 	}
 }
@@ -47,6 +99,10 @@ static int scanint(const char **ptr) {
 }
 
 int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
+	if (f == stdin) {
+		fflush(stdout);
+	}
+
 	size_t totalCount = 0;
 	int processedCount = 0;
 	int ch;
@@ -56,12 +112,14 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 	int width;
 	bool alloc;
 
+	uint8_t base;
+	int qualifier;
+
 	for (; *format; format++) {
 		// Match detect whitespace
 		if (isspace(*format)) {
 			while (isspace(format[1])) format++;
-			while (isspace(ch = fgetc(f))) totalCount++;
-			ungetc(ch, f);
+			totalCount += scan_space_f(f);
 			continue;
 		}
 
@@ -101,7 +159,6 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 			alloc = false;
 		}
 
-		int qualifier = 0;
 		switch (*format) {
 			case 'h':
 				if (*(++format) == 'h') {
@@ -123,6 +180,7 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 			case 'z':
 			case 't':
 			case 'L': qualifier = *(format++);
+			default: qualifier = 0;
 		}
 
 		switch (*format) {
@@ -135,29 +193,72 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 				storeQualifierD(target, qualifier, totalCount);
 				continue;
 			default:
-				while (isspace(ch = fgetc(f))) totalCount++;
-				ungetc(ch, f);
+				totalCount += scan_space_f(f);
 				break;
 		}
 
 		switch (*format) {
 			case 'd':
-			case 'i': {
-				assert(0);
-				break;
-			}
-			case 'p': {
-				assert(0);
-				break;
-			}
-			case 'o':
-				assert(0);
+				base = 10;
+				if (0) {
+				case 'i':
+					base = 0;
+				}
+				{
+					uintmax_t ret = 0;
+					int sign;
+					int len = scan_int_f(f, base, &ret, &sign);
+					if (len == 0) {
+						ch = feof(f) ? EOF : 0;
+						goto fail;
+					}
+					totalCount += len;
+					if (sign < 0) {
+						ret = ret ? INTMAX_MIN : INTMAX_MAX;
+					} else if (sign) {
+						if (ret > -(uintmax_t)INTMAX_MIN) {
+							ret = INTMAX_MIN;
+						} else {
+							ret = -ret;
+						}
+					} else if (ret > INTMAX_MAX) {
+						ret = INTMAX_MAX;
+					}
+					if (target)
+						storeQualifierD(target, qualifier, ret);
+					break;
+				}
+			case 'p':
 			case 'x':
 			case 'X':
-				assert(0);
-			case 'u':
-				assert(0);
-				break;
+				base = 16;
+				if (0) {
+				case 'o':
+					base = 8;
+				}
+				if (0) {
+				case 'u':
+					base = 10;
+				}
+				{
+					uintmax_t ret = 0;
+					int sign;
+					int len = scan_int_f(f, base, &ret, &sign);
+					if (len == 0) {
+						ch = feof(f) ? EOF : 0;
+						goto fail;
+					}
+					if (sign < 0) {
+						ret = ULLONG_MAX;
+					}
+					if (target) {
+						if (*format == 'p')
+							*(void**)target = (void*)ret;
+						else
+							storeQualifierU(target, qualifier, ret);
+					}
+					break;
+				}
 			case 'f':
 			case 'F':
 			case 'e':
@@ -166,7 +267,16 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 			case 'G':
 			case 'a':
 			case 'A': {
-				assert(0);
+				double val;
+				int len = scan_float_f(f, &val);
+				if (len == 0) {
+					ch = feof(f) ? EOF : 0;
+					goto fail;
+				}
+				totalCount += len;
+				if (target)
+					storeQualifierF(target, qualifier, val);
+				break;
 			}
 			case 'c': {
 				if (qualifier != 'l') {
@@ -268,6 +378,9 @@ scanstring: {
 			default:
 				goto format_err;
 		}
+
+		if (target)
+			processedCount++;
 	}
 
 	return processedCount;
