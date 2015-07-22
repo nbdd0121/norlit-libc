@@ -1,51 +1,13 @@
 #ifndef _NORLIT_LIBC_STDLIB_CONV_INTERNAL_H
 #define _NORLIT_LIBC_STDLIB_CONV_INTERNAL_H
 
-#include <stdint.h>
-#include <stddef.h>
-
-/**
- * str: string to be scanned
- * strlen: length of str
- * data: output, will *not* be cleared before use
- * overflow: will be incremented for every one digit overflown
- * base: radix
- * return: last char processed + 1
- */
-__attribute__((visibility("internal")))
-const char* scan_decimal(const char* str, unsigned long long* data, int* len, int* overflow, int base);
-
-__attribute__((visibility("internal")))
-const char* scan_space(const char* str);
-
 __attribute__((visibility("internal")))
 int scan_int(const char * restrict nptr, char ** restrict endptr, int base, unsigned long long* ret);
 
-// This struct is the diy_fp in Florian Loitsch's paper
-typedef struct {
-	uint64_t frac;
-	int16_t exp;
-} LongDouble;
-
-__attribute__((visibility("internal")))
-uint8_t count_leading_zeros(uint64_t);
-
-__attribute__((visibility("internal")))
-LongDouble construct_long_double(double val);
-
-__attribute__((visibility("internal")))
-uint8_t count_digits(uint64_t n);
-
-__attribute__((visibility("internal")))
-void desemble_double(double v, uint64_t* s, int* n, int* k);
-
-__attribute__((visibility("internal")))
-double assemble_double(uint64_t s, int n, int k);
-
-__attribute__((visibility("internal")))
-double assemble_double_hex(uint64_t s, int n, int k);
-
 __attribute__((visibility("internal")))
 const char* scan_float(const char* ptr, double* data);
+
+__attribute__((visibility("internal")))
+const char* scan_space(const char* str);
 
 #endif

@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <stdint.h>
 
-static size_t s_read(FILE *f, char *buf, size_t len) {
+size_t s_read(FILE *f, char *buf, size_t len) {
 	char* mbuf = f->additionalData;
 	size_t toRead = strnlen(mbuf, len);
 	if (toRead == 0) {

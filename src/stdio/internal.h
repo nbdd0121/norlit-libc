@@ -84,3 +84,6 @@ void moveFile(FILE*, FILE*);
 
 __attribute__((visibility("internal")))
 int checkFile(FILE*);
+
+__attribute__((visibility("internal")))
+size_t s_read(FILE *f, char *buf, size_t len);

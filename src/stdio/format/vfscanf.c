@@ -16,7 +16,8 @@
 #define _ulimit(val, max) (val>max?max:val)
 #define ulimit(val, limname) _ulimit(val, limname##_MAX)
 
-static void storeQualifierD(void* ptr, int qualifier, intmax_t data) {
+__attribute__((visibility("internal")))
+void storeQualifierD(void* ptr, int qualifier, intmax_t data) {
 	switch (qualifier) {
 		case 'H':
 			*(signed char*)ptr = (signed char)limit(data, SCHAR);
@@ -88,8 +89,8 @@ static void storeQualifierF(void* ptr, int qualifier, double data) {
 	}
 }
 
-// FIXME: Use existed replacement
-static int scanint(const char **ptr) {
+__attribute__((visibility("internal")))
+int scanint(const char **ptr) {
 	int res = 0;
 	const char *p = *ptr;
 	while (*p >= '0' && *p <= '9')
@@ -209,7 +210,6 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 					int sign;
 					int len = scan_int_f(f, width == -1 ? INT_MAX : width, base, &ret, &sign);
 					if (len == 0) {
-						ch = feof(f) ? EOF : 0;
 						goto fail;
 					}
 					totalCount += len;
@@ -245,7 +245,6 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 					int sign;
 					int len = scan_int_f(f, width == -1 ? INT_MAX : width, base, &ret, &sign);
 					if (len == 0) {
-						ch = feof(f) ? EOF : 0;
 						goto fail;
 					}
 					if (sign < 0) {
@@ -270,7 +269,6 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 				double val;
 				int len = scan_float_f(f, width == -1 ? INT_MAX : width, &val);
 				if (len == 0) {
-					ch = feof(f) ? EOF : 0;
 					goto fail;
 				}
 				totalCount += len;
@@ -390,10 +388,8 @@ scanstring: {
 
 	return processedCount;
 fail:
-	if (ch < 0)
-		return EOF;
-	return processedCount;
+	return processedCount ? processedCount : EOF;
 format_err:
 	errno = EINVAL;
-	return processedCount;
+	return processedCount ? processedCount : EOF;
 }

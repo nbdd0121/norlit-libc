@@ -7,7 +7,10 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
-#include "../../stdlib/conv/internal.h"
+#include "../conv/internal.h"
+
+void storeQualifierD(void* ptr, int qualifier, intmax_t data);
+int scanint(const char **ptr);
 
 enum {
 	FLAG_LEFT = 1,
@@ -36,16 +39,6 @@ static int formatUnsigned(uintmax_t num, char *str, uint8_t radix, int flags) {
 	return i;
 }
 
-// FIXME: Use existed replacement
-static int scanint(const char **ptr) {
-	int res = 0;
-	const char *p = *ptr;
-	while (*p >= '0' && *p <= '9')
-		res = res * 10 + (*(p++) - '0');
-	*ptr = p;
-	return res;
-}
-
 static int pad(FILE* f, char pad[8], int count) {
 	if (count == 0) return 0;
 	while (count > 8) {
@@ -54,35 +47,6 @@ static int pad(FILE* f, char pad[8], int count) {
 	}
 	if (!fwrite(pad, count, 1, f))return EOF;
 	return 0;
-}
-
-static void storeQualifierD(void* ptr, int qualifier, intmax_t data) {
-	switch (qualifier) {
-		case 'H':
-			*(signed char*)ptr = (signed char)data;
-			break;
-		case 'h':
-			*(short*)ptr = (short)data;
-			break;
-		case 'l':
-			*(long*)ptr = (long)data;
-			break;
-		case 'L':
-			*(long long*)ptr = (long long)data;
-			break;
-		case 'j':
-			*(intmax_t*)ptr = data;
-			break;
-		case 'z':
-			*(size_t*)ptr = (size_t)data;
-			break;
-		case 't':
-			*(ptrdiff_t*)ptr = (ptrdiff_t)data;
-			break;
-		default:
-			*(int*)ptr = (int)data;
-			break;
-	}
 }
 
 static intmax_t loadQualiferD(va_list* arg, int qualifier) {
