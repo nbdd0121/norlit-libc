@@ -9,7 +9,7 @@ int readRefill(FILE* f) {
 		return 0;
 	}
 	f->bufpos = 0;
-	f->buflim = f->read(f, f->buffer + f->buflim, f->bufsize - 1);
+	f->buflim = f->read(f, f->buffer, f->bufsize - 1);
 	if (f->buflim == 0) {
 		return 1;
 	}

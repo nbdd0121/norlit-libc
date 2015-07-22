@@ -540,7 +540,6 @@ unsignedFormatting: {
 				totalCount += ret;
 				continue;
 			}
-			break;
 			case 'c': {
 				if (qualifier != 'l') {
 					buf[0] = (char)va_arg(args, int);
