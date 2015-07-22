@@ -201,20 +201,26 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 	int len = 0;
 
 	if (format == 'a') {
-		LongDouble pack = construct_long_double(val);
-		s = pack.frac;
-		n = pack.exp;
+		if (val != 0) {
+			LongDouble pack = construct_long_double(val);
+			s = pack.frac;
+			n = pack.exp;
 
-		s <<= n % 4;
-		n /= 4;
+			s <<= n % 4;
+			n /= 4;
 
-		while (!(s & 0xF)) {
-			s >>= 4;
-			n++;
+			while (!(s & 0xF)) {
+				s >>= 4;
+				n++;
+			}
+
+			k = 64 / 4 - count_leading_zeros(s) / 4;
+			n += k;
+		} else {
+			s = 0;
+			n = 1;
+			k = 1;
 		}
-
-		k = 64 / 4 - count_leading_zeros(s) / 4;
-		n += k;
 
 		if (precision == -1) {
 			precision = k - 1;
@@ -227,6 +233,7 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 		if (val != 0) {
 			desemble_double(val, &s, &n, &k);
 		} else {
+			s = 0;
 			n = 1;
 			k = 1;
 		}
@@ -276,6 +283,12 @@ static int formatDouble(FILE* f, char* buffer, int format, int flags, int width,
 
 
 	if (format == 'a') {
+		if (s != 0) {
+			formatUnsigned(s, buffer, 10, 0);
+		} else {
+			buffer[0] = '0';
+		}
+
 		if (fputc('0', f)) return -1;
 		if (fputc(upperCase ? 'X' : 'x', f)) return -1;
 

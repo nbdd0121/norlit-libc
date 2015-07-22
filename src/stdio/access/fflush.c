@@ -4,7 +4,13 @@
 
 int fflush(FILE *f) {
 	if (f) {
-		if (f->bufpolicy == _IONBF) return 0;
+		if (!f->bufpolicy) return 0;
+		if (f->bufpolicy == _IONBF) {
+			if (f->bufpos) {
+				f->seek(f, -1, SEEK_CUR);
+			}
+			return 0;
+		}
 		if (f->bufmode == BUFMODE_WRITE) {
 			if (writeFully(f, f->buffer, f->bufpos) != f->bufpos) {
 				return EOF;
