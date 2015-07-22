@@ -15,7 +15,7 @@ size_t fread(void *restrict buf, size_t size, size_t nmemb, FILE *restrict f) {
 	if (!totalSize) {
 		return nmemb;
 	}
-	size_t count;
+	size_t count = 0;
 	switch (f->bufpolicy) {
 		case _IOLBF:
 		case _IOFBF:

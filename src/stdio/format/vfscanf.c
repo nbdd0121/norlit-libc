@@ -328,7 +328,7 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 			}
 scanstring: {
 				char* dest;
-				int len;
+				int len = 0;
 
 				// if m is set, we need to allocate memory
 				if (alloc) {

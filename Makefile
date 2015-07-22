@@ -1,5 +1,5 @@
 CC = i686-elf-gcc
-CFLAGS = -Wall -Iinclude/ -fpic
+CFLAGS = -Wall -Iinclude/ -fpic -Os
 LD = i686-elf-ld
 LDFLAGS = -shared
 

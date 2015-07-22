@@ -15,7 +15,7 @@ size_t fwrite(const void *restrict buf, size_t size, size_t nmemb, FILE *restric
 	if (!writeSize) {
 		return nmemb;
 	}
-	size_t count;
+	size_t count = 0;
 	switch (f->bufpolicy) {
 		case _IOLBF: {
 			const char* endptr = memrchr(buf, '\n', writeSize);
