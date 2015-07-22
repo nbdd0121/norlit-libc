@@ -4,10 +4,12 @@
 #include <math.h>
 #include <assert.h>
 
-int scan_float_f(FILE* f, double* data) {
+int scan_float_f(FILE* f, int maxlen, double* data) {
     bool sign = false;
 
     int len = 0;
+    if (len >= maxlen) return len;
+
     int ch = fgetc(f);
     switch (ch) {
         case '-':
@@ -20,16 +22,16 @@ int scan_float_f(FILE* f, double* data) {
             break;
     }
 
-    if (scan_string_f(f, "INF")) {
+    if (scan_string_f(f, maxlen - len, "INF")) {
         len += 3;
-        if (scan_string_f(f, "INITY")) {
+        if (scan_string_f(f, maxlen - len, "INITY")) {
             len += 5;
         }
         *data = sign ? -INFINITY : INFINITY;
         return len;
     }
 
-    if (scan_string_f(f, "NAN")) {
+    if (scan_string_f(f, maxlen - len, "NAN")) {
         len += 3;
         ch = fgetc(f);
         if (ch == '(') {
@@ -41,7 +43,7 @@ int scan_float_f(FILE* f, double* data) {
     }
 
     int base = 10;
-    if (scan_string_f(f, "0X")) {
+    if (scan_string_f(f, maxlen - len, "0X")) {
         len += 2;
         base = 16;
     }
@@ -50,25 +52,26 @@ int scan_float_f(FILE* f, double* data) {
     int n = 0;
     int k = 0;
 
-    if (scan_string_f(f, ".")) {
+    if (scan_string_f(f, maxlen - len, ".")) {
         len ++;
-        len += scan_decimal_f(f, &s, &k, NULL, base);
+        len += scan_decimal_f(f, maxlen - len, &s, &k, NULL, base);
         if (!k) {
             *data = 0;
             return len;
         }
     } else {
-        len += scan_decimal_f(f, &s, NULL, &k, base);
-        if (scan_string_f(f, ".")) {
+        len += scan_decimal_f(f, maxlen - len, &s, NULL, &k, base);
+        if (scan_string_f(f, maxlen - len, ".")) {
             len++;
-            len += scan_decimal_f(f, &s, &k, NULL, base);
+            len += scan_decimal_f(f, maxlen - len, &s, &k, NULL, base);
         }
     }
     /* Exponential part */
-    if (scan_string_f(f, base == 16 ? "P" : "E")) {
+    if (scan_string_f(f, maxlen - len, base == 16 ? "P" : "E")) {
         len++;
         bool sign = false;
 
+        if (len >= maxlen) goto assemble;
         ch = fgetc(f);
         if (ch == '+') {
             len++;
@@ -81,12 +84,13 @@ int scan_float_f(FILE* f, double* data) {
 
         unsigned long long expPart = 0;
         int expPartLength = 0;
-        len += scan_decimal_f(f, &expPart, &expPartLength, NULL, 10);
+        len += scan_decimal_f(f, maxlen - len, &expPart, &expPartLength, NULL, 10);
         if (expPart > 1000) expPart = 1000;
 
         n = (sign ? -1 : 1) * (int)expPart;
     }
 
+assemble:
     while (s > UINT64_MAX) {
         s >>= 1;
     }

@@ -2,8 +2,9 @@
 #include <ctype.h>
 #include <string.h>
 
-int scan_string_f(FILE* f, char* str) {
+int scan_string_f(FILE* f, int maxlen, char* str) {
     int len = strlen(str);
+    if (len > maxlen) return 0;
     char buf[len];
     int i;
     for (i = 0; i < len; i++) {

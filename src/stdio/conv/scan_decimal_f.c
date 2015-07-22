@@ -8,12 +8,12 @@ static inline int getdigit(char ch) {
 	return -1;
 }
 
-int scan_decimal_f(FILE* f, unsigned long long* data, int* len, int* overflow, int base) {
+int scan_decimal_f(FILE* f, int maxlen, unsigned long long* data, int* len, int* overflow, int base) {
 	bool overflowFlag = false;
 	int overflowDigits = 0;
 	int processedLen = 0;
 	unsigned long long value = *data;
-	while (1) {
+	while (processedLen < maxlen) {
 		int ch = fgetc(f);
 		int digit = getdigit(ch);
 		if (digit >= 0 && digit < base) {
@@ -24,12 +24,12 @@ int scan_decimal_f(FILE* f, unsigned long long* data, int* len, int* overflow, i
 					overflowFlag = true;
 				} else {
 					value = newVal;
-					processedLen++;
 				}
 			}
 			if (overflowFlag) {
 				overflowDigits++;
 			}
+			processedLen++;
 		} else {
 			ungetc(ch, f);
 			break;
@@ -37,8 +37,8 @@ int scan_decimal_f(FILE* f, unsigned long long* data, int* len, int* overflow, i
 	}
 	*data = value;
 	if (len)
-		*len += processedLen;
+		*len += processedLen - overflowDigits;
 	if (overflow)
 		*overflow = overflowDigits;
-	return processedLen + overflowDigits;
+	return processedLen;
 }

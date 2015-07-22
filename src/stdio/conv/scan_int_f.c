@@ -2,8 +2,10 @@
 #include <limits.h>
 #include <errno.h>
 
-int scan_int_f(FILE* f, int base, unsigned long long* ret, int* sign) {
+int scan_int_f(FILE* f, int maxlen, int base, unsigned long long* ret, int* sign) {
 	int len = 0;
+
+	if (len >= maxlen) return len;
 	int ch = fgetc(f);
 	int neg = 0;
 	if (ch == '-') {
@@ -14,11 +16,10 @@ int scan_int_f(FILE* f, int base, unsigned long long* ret, int* sign) {
 	}
 
 	if (base == 0) {
-		ch = fgetc(f);
-		if (ch == '0') {
+		if (scan_string_f(f, maxlen - len, "0")) {
+			printf(")\n");
 			len++;
-			ch = fgetc(f);
-			if (ch == 'x' || ch == 'X') {
+			if (scan_string_f(f, maxlen - len, "X")) {
 				len++;
 				base = 16;
 			} else {
@@ -26,21 +27,11 @@ int scan_int_f(FILE* f, int base, unsigned long long* ret, int* sign) {
 				base = 8;
 			}
 		} else {
-			ungetc(ch, f);
 			base = 10;
 		}
 	} else if (base == 16) {
-		ch = fgetc(f);
-		if (ch == '0') {
-			len++;
-			ch = fgetc(f);
-			if (ch == 'x' || ch == 'X') {
-				len++;
-			} else {
-				ungetc(ch, f);
-			}
-		} else {
-			ungetc(ch, f);
+		if (scan_string_f(f, maxlen - len, "0X")) {
+			len += 2;
 		}
 	} else if (base < 2 || base > 36) {
 		*ret = 0;
@@ -49,7 +40,7 @@ int scan_int_f(FILE* f, int base, unsigned long long* ret, int* sign) {
 	}
 
 	int overflow = 0;
-	len += scan_decimal_f(f, ret, NULL, &overflow, base);
+	len += scan_decimal_f(f, maxlen - len, ret, NULL, &overflow, base);
 	if (overflow) {
 		*ret = neg;
 		*sign = -ERANGE;

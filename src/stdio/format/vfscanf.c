@@ -207,7 +207,7 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 				{
 					uintmax_t ret = 0;
 					int sign;
-					int len = scan_int_f(f, base, &ret, &sign);
+					int len = scan_int_f(f, width == -1 ? INT_MAX : width, base, &ret, &sign);
 					if (len == 0) {
 						ch = feof(f) ? EOF : 0;
 						goto fail;
@@ -243,7 +243,7 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 				{
 					uintmax_t ret = 0;
 					int sign;
-					int len = scan_int_f(f, base, &ret, &sign);
+					int len = scan_int_f(f, width == -1 ? INT_MAX : width, base, &ret, &sign);
 					if (len == 0) {
 						ch = feof(f) ? EOF : 0;
 						goto fail;
@@ -253,7 +253,7 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 					}
 					if (target) {
 						if (*format == 'p')
-							*(void**)target = (void*)ret;
+							*(void**)target = (void*)(uintptr_t)ret;
 						else
 							storeQualifierU(target, qualifier, ret);
 					}
@@ -268,7 +268,7 @@ int vfscanf(FILE * restrict f, const char * restrict format, va_list args) {
 			case 'a':
 			case 'A': {
 				double val;
-				int len = scan_float_f(f, &val);
+				int len = scan_float_f(f, width == -1 ? INT_MAX : width, &val);
 				if (len == 0) {
 					ch = feof(f) ? EOF : 0;
 					goto fail;
@@ -340,6 +340,9 @@ scanstring: {
 					} else {
 						dest = malloc(width + 1);
 					}
+					if (!dest) {
+						goto fail;
+					}
 				} else {
 					dest = (char*)target;
 				}
@@ -362,6 +365,8 @@ scanstring: {
 					if (alloc && width == -1 && i >= len) {
 						len += 10;
 						dest = realloc(dest, len);
+						if (!dest)
+							goto fail;
 					}
 
 					if (dest)

@@ -13,19 +13,19 @@
  * base: radix
  */
 __attribute__((visibility("internal")))
-int scan_decimal_f(FILE* f, unsigned long long* data, int* len, int* overflow, int base);
+int scan_decimal_f(FILE* f, int maxlen, unsigned long long* data, int* len, int* overflow, int base);
 
 __attribute__((visibility("internal")))
 int scan_space_f(FILE* f);
 
 __attribute__((visibility("internal")))
-int scan_string_f(FILE* f, char* str);
+int scan_string_f(FILE* f, int maxlen, char* str);
 
 __attribute__((visibility("internal")))
-int scan_int_f(FILE* f, int base, unsigned long long* ret, int* sign);
+int scan_int_f(FILE* f, int maxlen, int base, unsigned long long* ret, int* sign);
 
 __attribute__((visibility("internal")))
-int scan_float_f(FILE* f, double* data);
+int scan_float_f(FILE* f, int maxlen, double* data);
 
 // This struct is the diy_fp in Florian Loitsch's paper
 typedef struct {
