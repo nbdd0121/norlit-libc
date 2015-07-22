@@ -17,7 +17,7 @@ int fgetc(FILE *f) {
 			return EOF;
 		}
 	}
-	return f->buffer[f->bufpos++];
+	return (unsigned char)f->buffer[f->bufpos++];
 }
 
 strong_alias(fgetc, getc);
