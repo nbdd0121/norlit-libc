@@ -38,7 +38,7 @@ Header               Status
 <threads.h>        **Not supported** [1]_
 <time.h>           Under consideration
 <uchar.h>          **Not supported** [6]_
-<wchar.h>          **Not supported** [6]_
+<wchar.h>          Stub [6]_
 <wctype.h>         **Not supported** [6]_
 ================== ===============================
 

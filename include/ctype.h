@@ -4,6 +4,15 @@
 #define __need_locale_t
 #include <norlit/alltypes.h>
 
+#define _U 0x1
+#define _L 0x2
+#define _N 0x4
+#define _S 0x8
+#define _P 0x10
+#define _C 0x20
+#define _X 0x40
+#define _B 0x80
+
 #include <norlit/header/start.h>
 
 int   isalnum(int);
