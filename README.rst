@@ -36,7 +36,7 @@ Header               Status
 <string.h>         **Implemented**
 <tgmath.h>         **Freestanding** [2]_
 <threads.h>        **Not supported** [1]_
-<time.h>           Under consideration
+<time.h>           Stub
 <uchar.h>          **Not supported** [6]_
 <wchar.h>          Stub [6]_
 <wctype.h>         **Not supported** [6]_
