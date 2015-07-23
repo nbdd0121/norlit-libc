@@ -2,7 +2,9 @@
 #define _NORLIT_LIBC_CTYPE_H
 
 #define __need_locale_t
-#include <locale.h>
+#include <norlit/alltypes.h>
+
+#include <norlit/header/start.h>
 
 int   isalnum(int);
 int   isalpha(int);
@@ -40,5 +42,7 @@ int   isascii(int);
 int   toascii(int);
 #define _tolower(x) ((x)|0x20)
 #define _toupper(x) ((x)&0x5f)
+
+#include <norlit/header/end.h>
 
 #endif

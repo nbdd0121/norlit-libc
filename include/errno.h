@@ -83,6 +83,8 @@
 #define ETXTBSY         78
 #define EXDEV           79
 
+#include <norlit/header/start.h>
 extern int errno;
+#include <norlit/header/end.h>
 
 #endif

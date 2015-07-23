@@ -1,16 +1,18 @@
 #ifndef _NORLIT_LIBC_ASSERT_H
 #define _NORLIT_LIBC_ASSERT_H
 
+#ifndef __cplusplus
 #define static_assert _Static_assert
+#endif
 
+#include <norlit/header/start.h>
 _Noreturn
 void __norlit_libc_assertion_failure(const char *file, int line, const char *func, const char *expr);
+#include <norlit/header/end.h>
 
 #endif
 
-#ifdef assert
-#undef
-#endif
+#undef assert
 
 #ifdef NDEBUG
 #define assert(ignore) ((void)0)

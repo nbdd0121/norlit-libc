@@ -3,7 +3,9 @@
 
 // This is a stub
 
+#include <norlit/header/start.h>
 int open(const char*, int, ...);
+#include <norlit/header/end.h>
 
 #define O_EXEC   0
 #define O_RDONLY 1

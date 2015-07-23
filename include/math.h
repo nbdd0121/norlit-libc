@@ -1,9 +1,6 @@
 #ifndef _NORLIT_LIBC_MATH_H
 #define _NORLIT_LIBC_MATH_H
 
-typedef float float_t;
-typedef double double_t;
-
 #define NAN       __builtin_nanf("")
 #define INFINITY  __builtin_inff()
 #define HUGE_VALF __builtin_huge_valf()
@@ -56,6 +53,10 @@ typedef double double_t;
 #define M_2_SQRTPI      1.12837916709551257390
 #define M_SQRT2         1.41421356237309504880
 #define M_SQRT1_2       0.70710678118654752440
+
+#include <norlit/header/start.h>
+typedef float float_t;
+typedef double double_t;
 
 double      acos(double);
 float       acosf(float);
@@ -239,5 +240,6 @@ double      yn(int, double);
 
 // XSI Extensions
 extern int signgam;
+#include <norlit/header/end.h>
 
 #endif

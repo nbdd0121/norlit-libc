@@ -12,19 +12,20 @@
 
 #define MB_CUR_MAX      ((size_t)4)
 
+#include <norlit/header/start.h>
 typedef struct {
-    int quot;
-    int rem;
+	int quot;
+	int rem;
 } div_t;
 
 typedef struct {
-    long quot;
-    long rem;
+	long quot;
+	long rem;
 } ldiv_t;
 
 typedef struct {
-    long long quot;
-    long long rem;
+	long long quot;
+	long long rem;
 } lldiv_t;
 
 // CX Extensions
@@ -55,23 +56,23 @@ long long     llabs(long long);
 lldiv_t       lldiv(long long, long long);
 void         *malloc(size_t);
 int           mblen(const char *, size_t);
-size_t        mbstowcs(wchar_t *restrict, const char *restrict, size_t);
-int           mbtowc(wchar_t *restrict, const char *restrict, size_t);
+size_t        mbstowcs(wchar_t *__restrict, const char *__restrict, size_t);
+int           mbtowc(wchar_t *__restrict, const char *__restrict, size_t);
 void          qsort(void *, size_t, size_t, int (*)(const void *, const void *));
 _Noreturn
 void          quick_exit(int status);
 int           rand(void);
 void         *realloc(void *, size_t);
 void          srand(unsigned);
-double        strtod(const char *restrict, char **restrict);
-float         strtof(const char *restrict, char **restrict);
-long          strtol(const char *restrict, char **restrict, int);
-long double   strtold(const char *restrict, char **restrict);
-long long     strtoll(const char *restrict, char **restrict, int);
-unsigned long strtoul(const char *restrict, char **restrict, int);
-unsigned long long strtoull(const char *restrict, char **restrict, int);
+double        strtod(const char *__restrict, char **__restrict);
+float         strtof(const char *__restrict, char **__restrict);
+long          strtol(const char *__restrict, char **__restrict, int);
+long double   strtold(const char *__restrict, char **__restrict);
+long long     strtoll(const char *__restrict, char **__restrict, int);
+unsigned long strtoul(const char *__restrict, char **__restrict, int);
+unsigned long long strtoull(const char *__restrict, char **__restrict, int);
 int           system(const char *);
-size_t        wcstombs(char *restrict, const wchar_t *restrict, size_t);
+size_t        wcstombs(char *__restrict, const wchar_t *__restrict, size_t);
 int           wctomb(char *, wchar_t);
 
 // XSI Extensions
@@ -90,7 +91,7 @@ int           posix_openpt(int);
 char         *ptsname(int);
 int           putenv(char *);
 long          random(void);
-char         *realpath(const char *restrict, char *restrict);
+char         *realpath(const char *__restrict, char *__restrict);
 unsigned short *seed48(unsigned short [3]);
 void          setkey(const char *);
 char         *setstate(char *);
@@ -108,5 +109,6 @@ int           rand_r(unsigned *);
 
 // ADV Extensions
 int           posix_memalign(void **, size_t, size_t);
+#include <norlit/header/end.h>
 
 #endif

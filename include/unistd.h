@@ -6,6 +6,7 @@
 #define __need_ssize_t
 #include <sys/types.h>
 
+#include <norlit/header/start.h>
 extern char** environ;
 
 int          close(int);
@@ -14,5 +15,6 @@ void         _exit(int);
 off_t        lseek(int, off_t, int);
 ssize_t      read(int, void *, size_t);
 ssize_t      write(int, const void *, size_t);
+#include <norlit/header/end.h>
 
 #endif
