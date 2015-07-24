@@ -338,8 +338,7 @@ ret:
 	return width > len ? width : len;
 }
 
-
-int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
+static int vfprintf_impl(FILE * restrict f, const char * restrict format, va_list* args) {
 	size_t totalCount = 0;
 
 	for (;; format++) {
@@ -377,7 +376,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 
 		int width = -1;
 		if (*format == '*') {
-			width = va_arg(args, int);
+			width = va_arg(*args, int);
 			if (width < 0) {
 				flags |= FLAG_LEFT;
 				width = -width;
@@ -391,7 +390,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 		if (*format == '.') {
 			format++;
 			if (*format == '*') {
-				precision = va_arg(args, int);
+				precision = va_arg(*args, int);
 				if (precision < 0) {
 					precision = -1;
 				}
@@ -450,7 +449,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 		switch (*format) {
 			case 'd':
 			case 'i': {
-				intmax_t val = loadQualiferD(&args, qualifier);
+				intmax_t val = loadQualiferD(args, qualifier);
 				if (val < 0) {
 					prefix = "-";
 					prefixLen = 1;
@@ -470,7 +469,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 			case 'p': {
 				prefix = "0x";
 				prefixLen = 2;
-				uintmax_t val = (uintptr_t)va_arg(args, void*);
+				uintmax_t val = (uintptr_t)va_arg(*args, void*);
 				bodyLen = formatUnsigned(val, buf, 16, 0);
 				if (precision < (int)sizeof(uintptr_t) * 2)
 					precision = sizeof(uintptr_t) * 2;
@@ -497,7 +496,7 @@ int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
 			case 'u':
 				base = 10;
 unsignedFormatting: {
-					uintmax_t val = loadQualiferU(&args, qualifier);
+					uintmax_t val = loadQualiferU(args, qualifier);
 					bodyLen = formatUnsigned(val, buf, base, flags);
 					if (precision == -1)
 						precision = 1;
@@ -511,7 +510,7 @@ unsignedFormatting: {
 			case 'G':
 			case 'a':
 			case 'A': {
-				int ret = formatDouble(f, buf, *format, flags, width, precision, qualifier == 'L' ? (double)va_arg(args, long double) : va_arg(args, double));
+				int ret = formatDouble(f, buf, *format, flags, width, precision, qualifier == 'L' ? (double)va_arg(*args, long double) : va_arg(*args, double));
 				if (ret == -1)
 					return EOF;
 				totalCount += ret;
@@ -519,7 +518,7 @@ unsignedFormatting: {
 			}
 			case 'c': {
 				if (qualifier != 'l') {
-					buf[0] = (char)va_arg(args, int);
+					buf[0] = (char)va_arg(*args, int);
 					bodyLen = 1;
 					// 0 for %c is ignored
 					flags &= ~FLAG_ZERO;
@@ -531,7 +530,7 @@ unsignedFormatting: {
 				assert(0);
 			case 's': {
 				if (qualifier != 'l') {
-					body = va_arg(args, char*);
+					body = va_arg(*args, char*);
 					if (!body) body = "(null)";
 					bodyLen = precision == -1 ? strlen(body) : strnlen(body, precision);
 					// 0 for %s is ignored
@@ -543,7 +542,7 @@ unsignedFormatting: {
 			case 'S':
 				assert(0);
 			case 'n':
-				storeQualifierD(va_arg(args, void*), qualifier, totalCount);
+				storeQualifierD(va_arg(*args, void*), qualifier, totalCount);
 				continue;
 			default:
 				// Undefined behavior
@@ -578,4 +577,12 @@ unsignedFormatting: {
 
 		totalCount += currentWidth + padCount;
 	}
+}
+
+int vfprintf(FILE * restrict f, const char * restrict format, va_list args) {
+	va_list newArgs;
+	va_copy(newArgs, args);
+	int ret = vfprintf_impl(f, format, &newArgs);
+	va_end(newArgs);
+	return ret;
 }
