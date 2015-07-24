@@ -1,7 +1,10 @@
 #include <stdint.h>
+#include <assert.h>
 
 #if UINTPTR_MAX == UINT64_MAX
-#error x64 not supported yet
+void setjmp(void) {
+    assert(0);
+}
 #else
 __asm__(
     ".global setjmp\n"

@@ -52,6 +52,8 @@ int   toascii(int);
 #define _tolower(x) ((x)|0x20)
 #define _toupper(x) ((x)&0x5f)
 
+extern const char _ctype_[];
+
 #include <norlit/header/end.h>
 
 #endif

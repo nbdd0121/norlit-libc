@@ -24,9 +24,9 @@ typedef off_t fpos_t;
 #define _IOLBF 2
 #define _IONBF 3
 
-#define SEEK_CUR 0
-#define SEEK_END 1
-#define SEEK_SET 2
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
 
 // TODO: These three need to be fixed
 #define FILENAME_MAX 0xFFFF
