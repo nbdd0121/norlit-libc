@@ -18,7 +18,7 @@ Header               Status
 <fenv.h>           Under consideration
 <float.h>          **Freestanding**
 <inttypes.h>       **Implemented**
-<iso646.h>         **Freestanding**
+<iso646.h>         **Implemented**
 <limits.h>         **Freestanding**
 <locale.h>         **Implemented**
 <math.h>           27/69 (ISO C), 0/6 (POSIX) [4]_
