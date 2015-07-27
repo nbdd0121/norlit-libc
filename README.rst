@@ -29,7 +29,7 @@ Header               Status
 <stdatomic.h>      **Freestanding** [2]_
 <stdbool.h>        **Freestanding**
 <stddef.h>         **Freestanding**
-<stdint.h>         **Freestanding**
+<stdint.h>         **Implemented**
 <stdio.h>          **Implemented** (ISO C) [5]_ 4/22 (POSIX)
 <stdlib.h>         **Implemented** (ISO C) [3]_ 4/27 (POSIX) [7]_
 <stdnoreturn.h>    **Freestanding**
