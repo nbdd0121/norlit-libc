@@ -24,7 +24,7 @@ Header               Status
 <math.h>           27/69 (ISO C), 0/6 (POSIX) [4]_
 <setjmp.h>         **Implemented** (ISO C) 2/4 (POSIX) [8]_
 <signal.h>         Stub
-<stdalign.h>       **Freestanding**
+<stdalign.h>       **Implemented**
 <stdarg.h>         **Freestanding**
 <stdatomic.h>      **Freestanding** [2]_
 <stdbool.h>        **Freestanding**
