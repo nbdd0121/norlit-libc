@@ -27,7 +27,7 @@ Header               Status
 <stdalign.h>       **Implemented**
 <stdarg.h>         **Freestanding**
 <stdatomic.h>      **Freestanding** [2]_
-<stdbool.h>        **Freestanding**
+<stdbool.h>        **Implemented**
 <stddef.h>         **Freestanding**
 <stdint.h>         **Implemented**
 <stdio.h>          **Implemented** (ISO C) [5]_ 4/22 (POSIX)
