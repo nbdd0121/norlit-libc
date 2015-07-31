@@ -19,7 +19,7 @@ Header               Status
 <float.h>          **Freestanding**
 <inttypes.h>       **Implemented**
 <iso646.h>         **Implemented**
-<limits.h>         **Freestanding**
+<limits.h>         **Implemented**
 <locale.h>         **Implemented**
 <math.h>           27/69 (ISO C), 0/6 (POSIX) [4]_
 <setjmp.h>         **Implemented** (ISO C) 2/4 (POSIX) [8]_
