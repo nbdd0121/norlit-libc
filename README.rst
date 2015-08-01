@@ -16,10 +16,10 @@ Header               Status
 <ctype.h>          **Implemented**
 <errno.h>          **Implemented**
 <fenv.h>           Under consideration
-<float.h>          **Freestanding**
+<float.h>          **Implemented** [9]_
 <inttypes.h>       **Implemented**
 <iso646.h>         **Implemented**
-<limits.h>         **Implemented**
+<limits.h>         **Implemented** (ISO C)
 <locale.h>         **Implemented**
 <math.h>           27/69 (ISO C), 0/6 (POSIX) [4]_
 <setjmp.h>         **Implemented** (ISO C) 2/4 (POSIX) [8]_
@@ -50,6 +50,7 @@ Header               Status
 .. [6] Intended, but violate the standard
 .. [7] long double <-> string conversion is approximated with double <-> string conversion
 .. [8] Current there is only x86 support
+.. [9] FLT_ROUND and FLT_EVAL_METHOD are not implemented and will abort when used
 
 TODO List
 =========
