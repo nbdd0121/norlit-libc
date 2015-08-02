@@ -51,7 +51,7 @@
 #define LONG_MAX        __LONG_MAX__
 #define ULONG_MAX       (2UL*LONG_MAX+1)
 #define LLONG_MIN       (~LLONG_MAX)
-#define LLONG_MAX       __LLONG_MAX__
+#define LLONG_MAX       __LONG_LONG_MAX__
 #define ULLONG_MAX      (2ULL*LLONG_MAX+1)
 
 #endif

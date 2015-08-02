@@ -79,7 +79,7 @@ typedef int pid_t;
 
 #ifdef __need_va_list
 #undef __need_va_list
-#include <stdarg.h>
+typedef __builtin_va_list va_list;
 #endif
 
 #if defined(__need_size_t) || defined(__need_wchar_t)

@@ -24,14 +24,15 @@
  * DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdarg.h>
+#ifndef _NORLIT_LIBC_STDARG_H
+#define _NORLIT_LIBC_STDARG_H
 
-int fscanf(FILE *restrict f, const char *restrict fmt, ...) {
-	int ret;
-	va_list ap;
-	va_start(ap, fmt);
-	ret = vfscanf(f, fmt, ap);
-	va_end(ap);
-	return ret;
-}
+#define __need_va_list
+#include <norlit/alltypes.h>
+
+#define va_start(list,arg) __builtin_va_start(list,arg)
+#define va_end(list)       __builtin_va_end(list)
+#define va_arg(list,type)  __builtin_va_arg(list,type)
+#define va_copy(dst,src)   __builtin_va_copy(dst,src)
+
+#endif
