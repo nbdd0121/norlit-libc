@@ -24,29 +24,29 @@
  * DAMAGE.
  */
 
-#if !defined(__need_off_t) && \
-	!defined(__need_size_t) && !defined(__need_ssize_t)
-#ifndef _NORLIT_SYS_TYPES_H
-#define _NORLIT_SYS_TYPES_H
-#define __need_off_t
+#ifdef __cplusplus
+#define NULL 0
+#else
+#define NULL ((void*)0)
+#endif
+
+#ifdef __need_NULL
+#undef __need_NULL
+#else
+#ifndef _NORLIT_LIBC_STDDEF_H
+#define _NORLIT_LIBC_STDDEF_H
+
 #define __need_size_t
-#define __need_ssize_t
-#endif
-#endif
-
-#include <stdint.h>
-
-#ifdef __need_off_t
-#undef __need_off_t
-typedef int64_t off_t;
-#endif
-
-#ifdef __need_ssize_t
-#undef __need_ssize_t
-typedef intptr_t ssize_t;
-#endif
-
-#ifdef __need_size_t
+#define __need_wchar_t
+#define __need_ptrdiff_t
 #include <norlit/alltypes.h>
-#endif
 
+typedef struct {
+	long long __max_align_ll __attribute__((__aligned__(__alignof__(long long))));
+	long double __max_align_ld __attribute__((__aligned__(__alignof__(long double))));
+} max_align_t;
+
+#define offsetof(TYPE, MEMBER) __builtin_offsetof(TYPE, MEMBER)
+
+#endif
+#endif

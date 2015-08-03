@@ -82,8 +82,19 @@ typedef int pid_t;
 typedef __builtin_va_list va_list;
 #endif
 
-#if defined(__need_size_t) || defined(__need_wchar_t)
-#include <stddef.h>
+#ifdef __need_size_t
+#undef __need_size_t
+typedef __SIZE_TYPE__ size_t;
+#endif
+
+#ifdef __need_wchar_t
+#undef __need_wchar_t
+typedef __WCHAR_TYPE__ wchar_t;
+#endif
+
+#ifdef __need_ptrdiff_t
+#undef __need_ptrdiff_t
+typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #endif
 
 #include <norlit/header/end.h>
