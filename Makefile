@@ -1,9 +1,3 @@
-CC = i686-elf-gcc
-CFLAGS = -Wall -Iinclude/ -fpic -Os
-LD = i686-elf-ld
-LDFLAGS = -shared
-
-OUTPUT = libc.so
 # Copyright (c) 2015, Gary Guo 
 # All rights reserved. 
 # 
@@ -28,6 +22,15 @@ OUTPUT = libc.so
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
 # DAMAGE. 
 
+CC = x86_64-elf-gcc
+#CFLAGS = -Wall -Iinclude/ -fpic -Os
+CFLAGS = -Wall -Iinclude/ -Os -mcmodel=large -Werror
+#LD = i686-elf-ld
+#LDFLAGS = -shared
+LD = x86_64-elf-ar
+LDFLAGS = crf
+#OUTPUT = libc.so
+OUTPUT = libc.a
 
 SRC_FILES = $(shell find src/ | grep '\'.c$\'')
 BIN_FILES = $(SRC_FILES:src/%.c=bin/%.o)
@@ -44,8 +47,9 @@ LIBGCC = $(shell $(CC) $(CFLAGS) --print-file-name=libgcc.a)
 all: $(OUTPUT)
 
 $(OUTPUT): $(CRTI) $(CRTN) $(BIN_FILES)
-	$(LD) $(LDFLAGS) $(CRTI) $(CRTBEGIN) $(BIN_FILES) $(CRTEND) $(CRTN) $(LIBGCC) -o $(OUTPUT)
-	strip $(OUTPUT)
+#	$(LD) $(LDFLAGS) $(CRTI) $(CRTBEGIN) $(BIN_FILES) $(CRTEND) $(CRTN) $(LIBGCC) -o $(OUTPUT)
+#	strip $(OUTPUT)
+	$(LD) $(LDFLAGS) $(OUTPUT) $(BIN_FILES)
 
 -include $(DEP_FILES)
 
