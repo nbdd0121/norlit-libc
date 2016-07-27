@@ -127,6 +127,7 @@ FILE *fmemopen(void *restrict buf, size_t size, const char *restrict mode) {
 	f->seek = mem_seek;
 	f->close = mem_close;
 
+	f->fildes = -1;
 	f->bufmode = _IONBF;
 
 	memf->buf = buf;

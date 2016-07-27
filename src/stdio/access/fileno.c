@@ -28,7 +28,7 @@
 #include <errno.h>
 
 int fileno(FILE* file) {
-	if (file->fildes == 0) {
+	if (file->fildes == -1) {
 		// Not a file descriptor, perhaps memory stream
 		return -EBADF;
 	}
