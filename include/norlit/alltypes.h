@@ -87,6 +87,11 @@ typedef __builtin_va_list va_list;
 typedef __SIZE_TYPE__ size_t;
 #endif
 
+#ifdef __need_ssize_t
+#undef __need_ssize_t
+typedef __INTPTR_TYPE__ ssize_t;
+#endif
+
 #ifdef __need_wchar_t
 #undef __need_wchar_t
 typedef __WCHAR_TYPE__ wchar_t;
@@ -95,6 +100,51 @@ typedef __WCHAR_TYPE__ wchar_t;
 #ifdef __need_ptrdiff_t
 #undef __need_ptrdiff_t
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
+#endif
+
+#ifdef __need_blkcnt_t
+#undef __need_blkcnt_t
+typedef long blkcnt_t;
+#endif
+
+#ifdef __need_blksize_t
+#undef __need_blksize_t
+typedef long blksize_t;
+#endif
+
+#ifdef __need_dev_t
+#undef __need_dev_t
+typedef int dev_t;
+#endif
+
+#ifdef __need_ino_t
+#undef __need_ino_t
+typedef int ino_t;
+#endif
+
+#ifdef __need_mode_t
+#undef __need_mode_t
+typedef int mode_t;
+#endif
+
+#ifdef __need_nlink_t
+#undef __need_nlink_t
+typedef int nlink_t;
+#endif
+
+#ifdef __need_uid_t
+#undef __need_uid_t
+typedef int uid_t;
+#endif
+
+#ifdef __need_gid_t
+#undef __need_gid_t
+typedef int gid_t;
+#endif
+
+#ifdef __need_off_t
+#undef __need_off_t
+typedef __INT64_TYPE__ off_t;
 #endif
 
 #include <norlit/header/end.h>

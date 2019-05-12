@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Gary Guo 
+ * Copyright (c) 2019, Gary Guo 
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -24,28 +24,61 @@
  * DAMAGE. 
  */
 
-#ifndef _NORLIT_LIBC_UNISTD_H
-#define _NORLIT_LIBC_UNISTD_H
+#ifndef _NORLIT_SYS_STAT_H
+#define _NORLIT_SYS_STAT_H
 
-#define __need_size_t
-#define __need_ssize_t
+#define __need_blkcnt_t
+#define __need_blksize_t
+#define __need_dev_t
+#define __need_ino_t
+#define __need_mode_t
+#define __need_nlink_t
 #define __need_uid_t
 #define __need_gid_t
 #define __need_off_t
-#define __need_pid_t
+#define __need_time_t
 #include <norlit/alltypes.h>
 
-#include <norlit/header/start.h>
-extern char** environ;
+#define S_ISUID 04000
+#define S_ISGID 02000
+#define S_ISVTX 01000
+#define S_IRUSR 0400
+#define S_IWUSR 0200
+#define S_IXUSR 0100
+#define S_IRWXU 0700
+#define S_IRGRP 0040
+#define S_IWGRP 0020
+#define S_IXGRP 0010
+#define S_IRWXG 0070
+#define S_IROTH 0004
+#define S_IWOTH 0002
+#define S_IXOTH 0001
+#define S_IRWXO 0007
 
-int          chdir(const char *);
-int          close(int);
-_Noreturn
-void         _exit(int);
-char        *getcwd(char *, size_t);
-off_t        lseek(int, off_t, int);
-ssize_t      read(int, void *, size_t);
-ssize_t      write(int, const void *, size_t);
-#include <norlit/header/end.h>
+struct stat {
+    dev_t     st_dev;
+    ino_t     st_ino;
+    mode_t    st_mode;
+    nlink_t   st_nlink;
+    uid_t     st_uid;  
+    gid_t     st_gid;
+    dev_t     st_rdev;
+    off_t     st_size;
+    time_t    st_atime;
+    time_t    st_mtime;
+    time_t    st_ctime;
+    blksize_t st_blksize;
+    blkcnt_t  st_blocks;
+};
+
+int    chmod(const char *, mode_t);
+int    fchmod(int, mode_t);
+int    fstat(int, struct stat *);
+int    lstat(const char *__restrict, struct stat *__restrict);
+int    mkdir(const char *, mode_t);
+int    mkfifo(const char *, mode_t);
+int    mknod(const char *, mode_t, dev_t);
+int    stat(const char *__restrict, struct stat *__restrict);
+mode_t umask(mode_t);
 
 #endif
